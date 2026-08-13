@@ -1,0 +1,13 @@
+PRESENÇA VIVO — APLICATIVO INSTALÁVEL GRATUITO
+
+1. Publique esta pasta em uma hospedagem HTTPS gratuita, como GitHub Pages ou Netlify.
+2. Abra o endereço publicado no Google Chrome do Android.
+3. No menu de três pontos, escolha “Instalar aplicativo” ou “Adicionar à tela inicial”.
+
+ATUALIZAÇÕES
+Quando alterar o arquivo principal, aumente o número em sw.js:
+presenca-vivo-v1 -> presenca-vivo-v2
+Depois publique os arquivos novamente. Ao abrir o app conectado à internet, a nova versão será baixada.
+
+ATENÇÃO SOBRE OS DADOS
+Esta versão guarda dados somente no navegador/aparelho em que foi usada. Ela é ótima para teste e demonstração, mas técnicos e supervisores ainda não enxergam alterações uns dos outros. Para uso real da equipe, a próxima etapa é ligar o app a um banco online gratuito, como Firebase ou Supabase, com regras de acesso seguras.

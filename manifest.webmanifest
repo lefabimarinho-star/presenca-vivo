@@ -1,0 +1,12 @@
+{
+  "name": "Presença Vivo",
+  "short_name": "Presença Vivo",
+  "description": "Controle de marcação de presença e escala de plantão.",
+  "start_url": "./Presenca_Vivo_PHT_2120_2130_ESCALA_DEZEMBRO.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4F0F8",
+  "theme_color": "#660099",
+  "icons": [{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
