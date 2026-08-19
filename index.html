@@ -745,6 +745,9 @@
 </div>
 <div class="toast" id="toast"></div>
 
+<!-- Base compartilhada: Firebase / Cloud Firestore -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script>
 (function(){
   const KEY = 'ponto_data_v1';
@@ -762,6 +765,20 @@
   let pendingUid = null;
   let route = 'login';
   let adminTab = 'resumo';
+  const firebaseConfig = {
+    apiKey: 'AIzaSyA-DewWGR3oTLK31o1QlbkW0QT7lG5gV2A',
+    authDomain: 'presenca-vivo.firebaseapp.com',
+    projectId: 'presenca-vivo',
+    storageBucket: 'presenca-vivo.firebasestorage.app',
+    messagingSenderId: '1854907572807',
+    appId: '1:1854907572807:web:c34a47089b844d0bbf1502'
+  };
+  let cloudStore = null;
+  let cloudOnline = false;
+  try {
+    if (window.firebase && !firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    cloudStore = window.firebase ? firebase.firestore() : null;
+  } catch (e) { console.warn('Firebase indisponível', e); }
 
   function uid(){ return Math.random().toString(36).slice(2,10); }
   function todayISO(){ const d=new Date(); return d.toISOString().slice(0,10); }
@@ -820,14 +837,23 @@
 
   async function loadDB(){
     let isNew = false;
+    let cloudNeedsSeed = false;
     try {
       let val = null;
-      if (typeof window.storage !== 'undefined' && window.storage && typeof window.storage.get === 'function') {
+      if (cloudStore) {
+        const snapshot = await cloudStore.collection('presenca_vivo').doc('dados_compartilhados').get();
+        if (snapshot.exists && snapshot.data() && snapshot.data().conteudo) {
+          val = snapshot.data().conteudo;
+          cloudOnline = true;
+        }
+      }
+      if (!val && typeof window.storage !== 'undefined' && window.storage && typeof window.storage.get === 'function') {
         const res = await window.storage.get(KEY, true);
         val = res ? res.value : null;
-      } else {
+      } else if (!val) {
         val = localStorage.getItem(KEY);
       }
+      if (cloudStore && !cloudOnline && val) cloudNeedsSeed = true;
       if(val) {
         DB = JSON.parse(val);
       } else {
@@ -859,12 +885,20 @@
     if(!DB.resets){ DB.resets = []; migrated = true; }
     if(!DB.cidades_trabalho){ DB.cidades_trabalho = {}; migrated = true; }
     if(garantirSupervisoresOficiais()) migrated = true;
-    if(isNew || migrated) await saveDB();
+    if(isNew || migrated || cloudNeedsSeed) await saveDB();
   }
 
   async function saveDB(){
     try {
       const json = JSON.stringify(DB);
+      if (cloudStore) {
+        await cloudStore.collection('presenca_vivo').doc('dados_compartilhados').set({
+          conteudo: json,
+          atualizado_em: Date.now(),
+          versao: 1
+        });
+        cloudOnline = true;
+      }
       if (typeof window.storage !== 'undefined' && window.storage && typeof window.storage.set === 'function') {
         await window.storage.set(KEY, json, true);
       } else {
@@ -872,7 +906,7 @@
       }
     } catch(e) {
       console.error('storage error', e);
-      showToast('Falha ao salvar. Tente novamente.');
+      showToast('Falha ao sincronizar. Verifique a internet e tente novamente.');
     }
   }
 
