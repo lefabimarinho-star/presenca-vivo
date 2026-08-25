@@ -765,6 +765,15 @@
   let pendingUid = null;
   let route = 'login';
   let adminTab = 'resumo';
+  const IMPORTACAO_TECNICOS_V2 = [{"matricula":"A0178169","nome":"ABIMAEL REIS FERNANDES","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0179578","nome":"ADOLFO RICKIE FERREIRA GALVAO","supervisor":"CAMILA DA SILVA TORQUATO","status":"ATIVO","pht":"2130"},{"matricula":"G3540158","nome":"ADRIANO DE ANDRADEBACHIR","supervisor":"LINCOLN BEHRENDS DOS SANTOS","status":"ATIVO","pht":"1700"},{"matricula":"A0177731","nome":"ADRIANO RUBENS DOS ANJOS SILVA","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0178470","nome":"ALDO BRUNO GAIGHER LUCAS","supervisor":"MARCOS VINICIOS DE SOUZA SILVA","status":"ATIVO","pht":"2120"},{"matricula":"A0180706","nome":"ALEX JUNIOR SILVA CHAVES DE MEDEIRO","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0179305","nome":"ALEX RODRIGUES FERREIRA","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0173906","nome":"ALEXAND®O DE SOUZA BOLD!","supervisor":"HILTON VELTEN GONCALVES","status":"ATIVO","pht":"2120"},{"matricula":"A0177433","nome":"ALTAIR DE FREITAS JUNIOR","supervisor":"GABRIEL FERREIRA MAIA","status":"ATIVO","pht":"2130"},{"matricula":"G0097135","nome":"ANDERSON GOMES NASCIMENTO","supervisor":"EDUARDO QUEZADA MARTINS","status":"ATIVO","pht":"1700"},{"matricula":"A0130254","nome":"ARILIA GDI NASCIMENTO","supervisor":"WAGNER NESPOLI PEREIRA","status":"INSS","pht":"2120"},{"matricula":"A0181483","nome":"BRENOOW KINDERMAN PASSOS CORRE!","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0180771","nome":"BRENNO SANTOS ALVES","supervisor":"HILTON VELTEN GONCALVES","status":"ATIVO","pht":"2120"},{"matricula":"A0178546","nome":"BRUNOGAIADACOSTA","supervisor":"GABRIEL FERREIRA MAIA","status":"ATIVO","pht":"2120"},{"matricula":"AO126240","nome":"CAMILA DA SILVA TORQUATO","supervisor":"LINCOLN BEHRENDS DOS SANTOS","status":"ATIVO","pht":"1700"},{"matricula":"A0180764","nome":"CARLOS EDUARDO DA LUZ","supervisor":"GABRIEL FERREIRA MAIA","status":"ATIVO","pht":"2120"},{"matricula":"A0178197","nome":"CARLOS HENRIQUE 00S SANTOS PENA","supervisor":"GABRIEL FERREIRA MAIA","status":"ATIVO","pht":"2120"},{"matricula":"G3531699","nome":"CARLOS HENRIQUE RECOLIANO","supervisor":"LINCOLN BEHRENDS DOS SANTOS","status":"ATIVO","pht":"1700"},{"matricula":"A0180020","nome":"CHRISTOPHER EDUARDO HONORATO AR","supervisor":"MARCOS VINICIOS DE SOUZA SILVA","status":"ATIVO","pht":"2120"},{"matricula":"A0178009","nome":"CLEITON JORGE GOMES","supervisor":"CAMILA DA SILVA TORQUATO","status":"ATIVO","pht":"2120"},{"matricula":"A0180897","nome":"CRISLEY PAULO GUIMARAES","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0178844","nome":"DALMO MATIAS FILHO }","supervisor":"HILTON VELTEN GONCALVES","status":"ATIVO","pht":"2120"},{"matricula":"A0180374","nome":"DANIEL DOS SANTOS MIGGIORIN","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0178155","nome":"DENIS DA SILVA MENDES","supervisor":"GABRIEL FERREIRA MAIA","status":"ATIVO","pht":"2120"},{"matricula":"A0181365","nome":"DIOGO RICARDO LARA","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2120"},{"matricula":"A0179671","nome":"DOUGLAS QUEMELLE","supervisor":"MARCOS VINICIOS DE SOUZA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0178076","nome":"EDUARDO AJNIOR CAMILO PEREIRA","supervisor":"GABRIEL FERREIRA MAIA","status":"ATIVO","pht":"2120"},{"matricula":"A0179264","nome":"ELDER LUIZ DOS SANTOS PENA","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0179339","nome":"EMANUEL FLAMPYTO PEREIRA DA SILVA","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0180835","nome":"ERALDO DOS SANTOS SANTOS","supervisor":"CAMILA DA SILVA TORQUATO","status":"ATIVO","pht":"2130"},{"matricula":"A0181555","nome":"ERIC MATHEUS IRENE LIMA","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0181641","nome":"FABIANO JOSE DA SILVA MARTELETE","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"1700"},{"matricula":"A0181827","nome":"FABRICIO CARELI DE ARAUJO","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0179588","nome":"FARLEY FELIPE ALVES RIBEIRO DA SILVA","supervisor":"MARCOS VINICIOS DE SOUZA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"G3530432","nome":"FELIPE TORNER) DE OLIVEIRA","supervisor":"EDUARDO QUEZADA MARTINS","status":"ATIVO","pht":"1700"},{"matricula":"A0178809","nome":"FELLUIPE MOREIRA LIMA","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2130"},{"matricula":"A0180919","nome":"FERNANDO MARTINS ARALWWO","supervisor":"HILTON VELTEN GONCALVES","status":"ATIVO","pht":"2130"},{"matricula":"A0181366","nome":"FIUPE GUISA FERREIRA","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0178902","nome":"FLAVIO AMON JUNIOR","supervisor":"MARCOS VINICIOS DE SOUZA SILVA","status":"ATIVO","pht":"2120"},{"matricula":"A0181396","nome":"FLAVIO SANTOS ROCHA","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0183397","nome":"FRANCIELE RODRIGUES DOS SANTOS","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2120"},{"matricula":"A0133757","nome":"GABRIEL FERREIRA MAIA","supervisor":"EDUARDO QUEZADA MARTINS","status":"ATIVO","pht":"1700"},{"matricula":"A0177542","nome":"GABRIEL VIEIRA COSTA","supervisor":"GABRIEL FERREIRA MAIA","status":"ATIVO","pht":"2130"},{"matricula":"A0181568","nome":"GERBERSON DE JESUS ALMEIDA","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0180918","nome":"GERSOM OLIVEIJRA DOS SANTOS","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0100844","nome":"GESUE PAJEHU DE SOUZA","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2130"},{"matricula":"G0001134","nome":"GIULIANO FERREIRA","supervisor":"LINCOLN BEHRENDS DOS SANTOS","status":"FÉRIAS","pht":"1700"},{"matricula":"A0130197","nome":"GLAUCO CANDIDO SANTANA","supervisor":"EDUARDO QUEZADA MARTINS","status":"FÉRIAS","pht":"1700"},{"matricula":"A0173815","nome":"GUILHERME MOZELA BRANDAO","supervisor":"CAMILA DA SILVA TORQUATO","status":"ATIVO","pht":"2130"},{"matricula":"A0178198","nome":"GUSTAVO HENRIQUE NUNES","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0179283","nome":"HEBERT OLIVEIRA DA COSTA","supervisor":"HILTON VELTEN GONCALVES","status":"ATIVO","pht":"2120"},{"matricula":"A0177728","nome":"HESLAN DOMINGOS LOPES","supervisor":"MARCOS VINICIOS DE SOUZA SILVA","status":"ATIVO","pht":"2120"},{"matricula":"A0161825","nome":"HILTON VELTEN GONCALVES","supervisor":"LINCOLN BEHRENDS DOS SANTOS","status":"ATIVO","pht":"1700"},{"matricula":"A0181693","nome":"HUAN ALVES FERRAZ","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2120"},{"matricula":"A0179589","nome":"HUGO FARDIM","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0126221","nome":"IARA MARIA FERNANDES","supervisor":"WAGNER NESPOLI PEREIRA","status":"INSS","pht":"2120"},{"matricula":"A0173496","nome":"IGORMACHADONUNES","supervisor":"CAMILA DA SILVA TORQUATO","status":"ATIVO","pht":"2120"},{"matricula":"A0178848","nome":"IGORSCARPATIWORBETH","supervisor":"MARCOS VINICIOS DE SOUZA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0180538","nome":"ITALU CAMILO PEREIRA NEVES .","supervisor":"HILTON VELTEN GONCALVES","status":"ATIVO","pht":"2120"},{"matricula":"A0180019","nome":"IVAN AUGUSTO ALMEIDA CUNHA CARDO","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0178493","nome":"IZEQUIEL DA SILVA CALIXTO","supervisor":"GABRIEL FERREIRA MAIA","status":"ATIVO","pht":"2120"},{"matricula":"A0179861","nome":"JACKSON WASHINGTON PENHA DA SILVA","supervisor":"HILTON VELTEN GONCALVES","status":"ATIVO","pht":"2120"},{"matricula":"A0180931","nome":"JADISSON DOS SANTOS FREITAS","supervisor":"HILTON VELTEN GONCALVES","status":"ATIVO","pht":"2130"},{"matricula":"A0178832","nome":"JAISON CARLOS ROSA LOURENCO","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0178712","nome":"JOAO HENRIQUE VIEIRA BRAGA","supervisor":"CAMILA DA SILVA TORQUATO","status":"ATIVO","pht":"2120"},{"matricula":"A0178723","nome":"JOAO NAGAY BELLO JACINTO","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0178800","nome":"JOAO VICTOR SANTOS SALLES .","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0180892","nome":"JOAO VICTOR THEOTONIO CAMPOS","supervisor":"HILTON VELTEN GONCALVES","status":"ATIVO","pht":"2120"},{"matricula":"3535647","nome":"JOEL DE ARAUJO COSTA","supervisor":"GABRIEL FERREIRA MAIA","status":"ATIVO","pht":"2130"},{"matricula":"G3510816","nome":"JOHANNES FALK","supervisor":"LINCOLN BEHRENDS DOS SANTOS","status":"ATIVO","pht":"1700"},{"matricula":"G3517220","nome":"JONACI CAMI PERIM","supervisor":"EDUARDO QUEZADA MARTINS","status":"ATIVO","pht":"1700"},{"matricula":"G3532230","nome":"JONATHAN DA SILVA","supervisor":"LINCOLN BEHRENDS DOS SANTOS","status":"ATIVO","pht":"1700"},{"matricula":"A0179704","nome":"JONATHAS GOMES DOS SANTOS BARRET","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0181071","nome":"JORGE DE MERSON DA SILVA GAMA","supervisor":"EDUARDO QUEZADA MARTINS","status":"ATIVO","pht":"2120"},{"matricula":"A0179782","nome":"JOSE AROLDO SONEGHETN","supervisor":"MARCOS VINICIOS DE SOUZA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0180500","nome":"JOSE MARIA SILVA BARCELOS","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0179776","nome":"JOSENILDO CARDOSO DA SILVA","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0179634","nome":"KEVIN GUASTI BODART","supervisor":"MARCOS VINICIOS DE SOUZA SILVA","status":"ATIVO","pht":"2120"},{"matricula":"A0181476","nome":"KEVIN RICHARD KLEMS FERREIRA","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0183393","nome":"KLARKY STREY SILVA KUTZ","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0134817","nome":"LADIMIR PEREIRA DO ROSARIO","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0181370","nome":"LEONARDO CASTRO DA VITORIA","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0179319","nome":"LEONARDO CORDEIRO DOS SANTOS FER","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0181407","nome":"LEONE FERREIRA OA SILVA","supervisor":"LINCOLN BEHRENDS DOS SANTOS","status":"ATIVO","pht":"1700"},{"matricula":"A0180873","nome":"LUAN RIBEIRO DOS ANJOS","supervisor":"HILTON VELTEN GONCALVES","status":"ATIVO","pht":"2120"},{"matricula":"A0181473","nome":"LUCAS DE JESUS SILVA","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0179730","nome":"LUCAS PAIVA DE OLIVEIRA","supervisor":"MARCOS VINICIOS DE SOUZA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0181526","nome":"LUCAS THEOTONIO CAMPOS","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2120"},{"matricula":"A0177749","nome":"LUIS FELIPE ROCHA MARQUES LOURENC","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0177769","nome":"MADSON PINTO STOLZE","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0181303","nome":"MARCELOFERNANDOPASSOS","supervisor":"HILTON VELTEN GONCALVES","status":"ATIVO","pht":"2130"},{"matricula":"A0179762","nome":"MARCOS ANTONIO 00S SANTOS JUNIOR","supervisor":"CAMILA DA SILVA TORQUATO","status":"ATIVO","pht":"2130"},{"matricula":"G3537423","nome":"MARCOS VINICIOS DE SOUZA SILVA","supervisor":"LINCOLN BEHRENDS DOS SANTOS","status":"ATIVO","pht":"1700"},{"matricula":"A0178567","nome":"MARCOS VINICIUS DA SILVA","supervisor":"GABRIEL FERREIRA MAIA","status":"ATIVO","pht":"2120"},{"matricula":"A0178512","nome":"MARCUS VINICIUS SOUZA NASCIMENTO","supervisor":"CAMILA DA SILVA TORQUATO","status":"ATIVO","pht":"2130"},{"matricula":"A0181146","nome":"MATHEUS MACHADO VIEIRA","supervisor":"CAMILA DA SILVA TORQUATO","status":"ATIVO","pht":"2130"},{"matricula":"A0179754","nome":"MATHEUS TONON CUNHA","supervisor":"CAMILA DA SILVA TORQUATO","status":"ATIVO","pht":"2130"},{"matricula":"A0181422","nome":"MIKEIAS FRANCA SILVA .","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0180016","nome":"NOELSON DE SOUZA RODRIGUES","supervisor":"GABRIEL FERREIRA MAIA","status":"ATIVO","pht":"2120"},{"matricula":"A0179807","nome":"PABLO ALVES GUAST","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2130"},{"matricula":"A0180621","nome":"PAULO HENRIQUE COSTA SANTOS","supervisor":"MARCOS VINICIOS DE SOUZA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0180447","nome":"PAULO RICARDO TEIXEIRA ROCHA","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0181479","nome":"PEDRO JACKSON FERREIRA DA SILVA","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"1800"},{"matricula":"A0126214","nome":"PRISCILA TEIXEIRA DA SILVA ALMEIDA","supervisor":"EDUARDO QUEZADA MARTINS","status":"ATIVO","pht":"3522"},{"matricula":"A0481404","nome":"RAMON ALVES DOS SANTOS","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0180431","nome":"RAMON BARBOZA BRITO .","supervisor":"HILTON VELTEN GONCALVES","status":"ATIVO","pht":"2120"},{"matricula":"A0179860","nome":"RAMON PAULO MOREIRA","supervisor":"GABRIEL FERREIRA MAIA","status":"ATIVO","pht":"2120"},{"matricula":"A0173869","nome":"RAPHAEL ALVES DE MELO","supervisor":"CAMILA DA SILVA TORQUATO","status":"ATIVO","pht":"2120"},{"matricula":"A0178835","nome":"RAPHAEL PAULINO GONCALVES","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0180847","nome":"RAQUELDECASTROCORREIA","supervisor":"CAMILA DA SILVA TORQUATO","status":"ATIVO","pht":"2120"},{"matricula":"A0180489","nome":"RAYALISON SILVA DO NASCIMENTO","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0136847","nome":"REINALDO DA GRACA DANTAS","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0183418","nome":"RENAN DE ALMEIDA SOUZA","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2120"},{"matricula":"A0181418","nome":"ROBERTO AIRES FERREIRA","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0181509","nome":"RODRIGO CONTES DE JESUS SOUSA","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2120"},{"matricula":"A0179743","nome":"RODRIGO REBONATO SOARES RODAIGUI","supervisor":"HILTON VELTEN GONCALVES","status":"ATIVO","pht":"2120"},{"matricula":"A0178909","nome":"RODRIGO ZARDO SARMENTO","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0177405","nome":"RYAN FELIPE ALVES MESSIAS","supervisor":"GABRIEL FERREIRA MAIA","status":"ATIVO","pht":"2130"},{"matricula":"A0181493","nome":"RYCHARDES MATEUS SANTOS","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"G3531956","nome":"SAMUEL DOS SANTOS ARAUJO","supervisor":"EDUARDO QUEZADA MARTINS","status":"ATIVO","pht":"1700"},{"matricula":"A0180563","nome":"SARA KETRIEN KROHLING OTTONI","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0180778","nome":"SEBASTIAN ANORES TERRAZAS BARRAZA","supervisor":"HILTON VELTEN GONCALVES","status":"ATIVO","pht":"2120"},{"matricula":"A0179383","nome":"SERGIO BRITO DE OLIVEIRA","supervisor":"HILTON VELTEN GONCALVES","status":"ATIVO","pht":"2120"},{"matricula":"A0179879","nome":"SIONEY DA SILVA MOTA","supervisor":"MARCOS VINICIOS DE SOUZA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0177571","nome":"SILVIO CARLOS SPINDOLA","supervisor":"GABRIEL FERREIRA MAIA","status":"ATIVO","pht":"2130"},{"matricula":"A0179678","nome":"STANLEY CONCEICAO PASSOS","supervisor":"CAMILA DA SILVA TORQUATO","status":"ATIVO","pht":"2120"},{"matricula":"A0178250","nome":"TALITA TABTA MARQUES OTTONS ;","supervisor":"GABRIEL FERREIRA MAIA","status":"ATIVO","pht":"2120"},{"matricula":"A0132930","nome":"THAISA ROCHA SENA DE OLIVEIRA","supervisor":"EDUARDO QUEZADA MARTINS","status":"ATIVO","pht":"2120"},{"matricula":"A0181466","nome":"THIAGO RODRIGUES","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0180277","nome":"TIAGO SALLES BORGO","supervisor":"MARCOS VINICIOS DE SOUZA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0181696","nome":"UENISON EVANGELISTA MOTA","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"1800"},{"matricula":"A0177729","nome":"UUSSES DE SOUZA DUTRA","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0180441","nome":"VALDINE! DA SILVA AVELAR","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2130"},{"matricula":"A0180848","nome":"VICTOR PEREIRA NASCIMENTO","supervisor":"CAMILA DA SILVA TORQUATO","status":"ATIVO","pht":"2130"},{"matricula":"A0178624","nome":"VINICIUS NEVES PEREIRA","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2130"},{"matricula":"A0179798","nome":"WAGNER DE PAULA OLIVEIRA","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"1700"},{"matricula":"G3539934","nome":"WAGNER NESPOLI PEREIRA","supervisor":"LINCOLN BEHRENDS DOS SANTOS","status":"ATIVO","pht":"1700"},{"matricula":"A0180207","nome":"WANDERSON DE SOUSA AMORIM )","supervisor":"MARCOS VINICIOS DE SOUZA SILVA","status":"ATIVO","pht":"2120"},{"matricula":"A0178004","nome":"WELSON MAX CAVALCANTE BATISTA","supervisor":"MARCOS VINICIOS DE SOUZA SILVA","status":"ATIVO","pht":"2120"},{"matricula":"A0180625","nome":"WESLEM CALDEIRAS SOARES","supervisor":"THAISA ROCHA SENA DE OLIVEIRA","status":"ATIVO","pht":"2120"},{"matricula":"A0181402","nome":"WESLEY LEPAUS DE OLIVEIRA","supervisor":"LEONE FERREIRA DA SILVA","status":"ATIVO","pht":"2130"},{"matricula":"A0178659","nome":"ZENOR MIRANDOLA JUNIOR","supervisor":"WAGNER NESPOLI PEREIRA","status":"ATIVO","pht":"2120"}];
+  const ALIASES_SUPERVISORES = {
+    'MARCOS VINICIOS DE SOUZA SILVA':'MARCOS VINICIUS DE SOUZA SILVA',
+    'LEONE FERREIRA OA SILVA':'LEONE FERREIRA DA SILVA'
+  };
+  const MATRICULAS_CORRIGIDAS = { AO126240:'A0126240', '3535647':'G3535647' };
+  const PHTS_VALIDOS = ['1700','1800','2120','2130','3522'];
+
+
   const firebaseConfig = {
     apiKey: 'AIzaSyA-DewWGR3oTLK31o1QlbkW0QT7lG5gV2A',
     authDomain: 'presenca-vivo.firebaseapp.com',
@@ -812,7 +821,8 @@
       ['Jonathan da Silva','G3532230','Comum'],
       ['Leone Ferreira da Silva','A0181407','Comum'],
       ['Marcos Vinicius de Souza Silva','G3537423','Comum'],
-      ['Wagner Nespoli Pereira','G3539934','Comum']
+      ['Wagner Nespoli Pereira','G3539934','Comum'],
+      ['Thaisa Rocha Sena de Oliveira','A0132930','Comum']
     ];
     let changed = false;
     oficiais.forEach(([nome, matricula, role]) => {
@@ -834,6 +844,64 @@
     });
     return changed;
   }
+
+  function chaveNome(v){
+    return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9]/g,'').toUpperCase();
+  }
+  function phtValido(v){ return PHTS_VALIDOS.includes(String(v||'')); }
+
+  function garantirSupervisorImportado(nome){
+    const nomeAjustado = ALIASES_SUPERVISORES[nome] || nome;
+    let supervisor = DB.usuarios.find(u => chaveNome(u.nome_completo)===chaveNome(nomeAjustado));
+    if(supervisor) return supervisor;
+    const refs = {
+      'EDUARDO QUEZADA MARTINS':'A0999001',
+      'LINCOLN BEHRENDS DOS SANTOS':'A0999002'
+    };
+    const matricula = refs[nomeAjustado] || ('A099'+String(DB.usuarios.length+1).padStart(4,'0'));
+    supervisor = {
+      uid:uid(), nome_completo:nomeAjustado, matricula, login:matricula,
+      cargo:'Supervisor', role:'Comum', supervisor_uid:null, pht:'1700',
+      status_ativo:false, status_ferias:false, status_origem:'REFERÊNCIA',
+      email:'', senha:'', senha_provisoria:false, cadastro_referencia:true
+    };
+    DB.usuarios.push(supervisor);
+    return supervisor;
+  }
+
+  function aplicarImportacaoTecnicos(){
+    if(DB.importacao_tecnicos_versao>=2) return false;
+    let changed = false;
+    const matriculasSupervisores = new Set(['A0063915','A0126240','A0133757','A0161825','G3532230','A0181407','G3537423','G3539934','A0132930']);
+    IMPORTACAO_TECNICOS_V2.forEach(item => {
+      const matricula = MATRICULAS_CORRIGIDAS[item.matricula] || item.matricula;
+      const supervisor = garantirSupervisorImportado(item.supervisor);
+      let usuario = DB.usuarios.find(u => String(u.matricula||u.login||'').toUpperCase()===matricula);
+      const eSupervisor = matriculasSupervisores.has(matricula);
+      if(!usuario){
+        usuario = {uid:uid(), email:'', senha:'1234', senha_provisoria:true};
+        DB.usuarios.push(usuario);
+        changed = true;
+      }
+      const ativo = item.status==='ATIVO';
+      const dados = {
+        nome_completo:item.nome, matricula, login:matricula,
+        cargo:eSupervisor ? 'Supervisor' : 'Técnico',
+        role:matricula==='A0063915' ? 'Administrador' : 'Comum',
+        supervisor_uid:eSupervisor ? null : supervisor.uid,
+        pht:item.pht, status_ativo:ativo, status_ferias:item.status==='FÉRIAS',
+        status_origem:item.status
+      };
+      Object.entries(dados).forEach(([chave,valor]) => {
+        if(usuario[chave]!==valor){ usuario[chave]=valor; changed=true; }
+      });
+      if(!usuario.senha){ usuario.senha='1234'; usuario.senha_provisoria=true; changed=true; }
+    });
+    DB.importacao_tecnicos_versao = 2;
+    return true;
+  }
+
+
 
   async function loadDB(){
     let isNew = false;
@@ -885,6 +953,7 @@
     if(!DB.resets){ DB.resets = []; migrated = true; }
     if(!DB.cidades_trabalho){ DB.cidades_trabalho = {}; migrated = true; }
     if(garantirSupervisoresOficiais()) migrated = true;
+    if(aplicarImportacaoTecnicos()) migrated = true;
     if(isNew || migrated || cloudNeedsSeed) await saveDB();
   }
 
@@ -922,12 +991,14 @@
   function getUser(u){ return DB.usuarios.find(x => x.uid === u); }
   function currentUser(){ return getUser(currentUid); }
   function isMatriculaValida(v){ return /^(A0|G[0-9])[A-Z0-9]+$/.test(String(v||'').trim().toUpperCase()); }
+  // Coordenador possui as mesmas permissões operacionais de um Supervisor.
+  function ehLider(usuario){ return !!usuario && (usuario.cargo==='Supervisor' || usuario.cargo==='Coordenador'); }
   function supervisorDo(usuario){ return usuario && usuario.supervisor_uid ? getUser(usuario.supervisor_uid) : null; }
   function equipeDoSupervisor(supervisorUid){ return DB.usuarios.filter(x => x.supervisor_uid===supervisorUid); }
   function podeAnalisarSolicitacao(supervisor, solicitacao){
     if(!supervisor || !solicitacao) return false;
     if(supervisor.role==='Administrador') return true;
-    if(supervisor.cargo!=='Supervisor') return false;
+    if(!ehLider(supervisor)) return false;
     const solicitante = getUser(solicitacao.usuario_uid);
     return !!solicitante && solicitante.supervisor_uid===supervisor.uid;
   }
@@ -961,17 +1032,40 @@
     return counts;
   }
 
+  // Administrador recebe o relatório completo. Supervisor e Coordenador recebem somente sua equipe.
+  function usuariosDoRelatorio(){
+    const u = currentUser();
+    if(!u || u.role==='Administrador') return DB.usuarios.slice();
+    return ehLider(u) ? [u, ...equipeDoSupervisor(u.uid)] : [u];
+  }
+
+  function proximaEscalaPHT(pht){
+    const datas = datasPHT(String(pht||''));
+    if(!datas.length) return 'Sem programação automática para este PHT';
+    const hoje = todayISO();
+    const proxima = datas.find(d => d>=hoje);
+    return proxima ? fmtDate(proxima) : 'Escala encerrada em dezembro/2026';
+  }
+
+  function descricaoCidadeTecnico(tecnico, iso){
+    const reg = (DB.cidades_trabalho||{})[tecnico.uid+'_'+iso];
+    return reg && reg.cidade ? reg.cidade : 'Não informada';
+  }
+
   function buildReportText(){
     const mk = currentMonthKey();
+    const equipe = usuariosDoRelatorio();
+    const equipeUids = new Set(equipe.map(x => x.uid));
     const solAll = countSolicitacoes(s => equipeUids.has(s.usuario_uid));
-    const presAllMonth = countPresencas(p => p.data_formatada.slice(0,7) === mk);
-    const ativos = equipeVisivel.filter(x => x.status_ativo).length;
-    const ferias = DB.usuarios.filter(x => x.status_ferias).length;
+    const presAllMonth = countPresencas(p => equipeUids.has(p.usuario_uid) && p.data_formatada.slice(0,7) === mk);
+    const ativos = equipe.filter(x => x.status_ativo).length;
+    const ferias = equipe.filter(x => x.status_ferias).length;
+    const isoHoje = todayISO();
     const lines = [];
     lines.push('RELATÓRIO — CONTROLE DE PRESENÇA E ESCALA VIVO');
     lines.push('Gerado em: '+fmtDate(todayISO()));
     lines.push('');
-    lines.push('EQUIPE: '+DB.usuarios.length+' cadastrados · '+ativos+' ativos · '+ferias+' em férias');
+    lines.push('EQUIPE NO RELATÓRIO: '+equipe.length+' pessoa(s) · '+ativos+' ativos · '+ferias+' em férias');
     lines.push('');
     lines.push('SOLICITAÇÕES (total: '+solAll._total+')');
     lines.push('  Pendentes: '+solAll.Pendente+' | Aprovadas: '+solAll.Aprovado+' | Recusadas: '+solAll.Recusado);
@@ -980,7 +1074,7 @@
     lines.push('PRESENÇAS DO MÊS ('+mk+'), equipe toda:');
     lines.push('  '+TIPOS_PRESENCA.map(t => t+': '+(presAllMonth[t]||0)).join(' · ')+' | Total: '+presAllMonth._total);
     lines.push('');
-    const pend = DB.solicitacoes.filter(s => s.status === 'Pendente');
+    const pend = DB.solicitacoes.filter(s => s.status === 'Pendente' && equipeUids.has(s.usuario_uid));
     lines.push('SOLICITAÇÕES PENDENTES DE ANÁLISE ('+pend.length+'):');
     if(pend.length === 0) lines.push('  Nenhuma pendência no momento.');
     pend.forEach(s => {
@@ -991,10 +1085,41 @@
     lines.push('ESCALAS DE PLANTÃO REGISTRADAS ('+DB.escalas.length+'):');
     if(DB.escalas.length === 0) lines.push('  Nenhuma escala registrada.');
     DB.escalas.slice().sort((a,b) => b.data_fim_semana.localeCompare(a.data_fim_semana)).forEach(e => {
-      const nomes = e.escalados.map(id => { const p=getUser(id); return p?p.nome_completo:'?'; }).join(', ') || 'ninguém escalado';
-      lines.push('  - Fim de semana de '+fmtDate(e.data_fim_semana)+': '+nomes);
+      const nomes = e.escalados.filter(id => equipeUids.has(id)).map(id => { const p=getUser(id); return p?p.nome_completo:'?'; }).join(', ');
+      if(nomes) lines.push('  - Fim de semana de '+fmtDate(e.data_fim_semana)+': '+nomes);
+    });
+    lines.push('');
+    lines.push('DETALHAMENTO DOS TÉCNICOS — '+fmtDate(isoHoje));
+    const tecnicos = equipe.filter(x => x.cargo==='Técnico').sort((a,b)=>a.nome_completo.localeCompare(b.nome_completo));
+    if(!tecnicos.length) lines.push('  Nenhum técnico na equipe selecionada.');
+    tecnicos.forEach(t => {
+      const responsavel = supervisorDo(t);
+      lines.push('  - '+t.nome_completo+' · Matrícula: '+(t.matricula||t.login||'—'));
+      lines.push('    Responsável: '+(responsavel ? responsavel.nome_completo+' ('+responsavel.cargo+')' : 'Não definido'));
+      lines.push('    Cidade de atuação: '+descricaoCidadeTecnico(t, isoHoje));
+      lines.push('    PHT: '+(t.pht||'Não informado')+' · Próxima escala PHT: '+proximaEscalaPHT(t.pht));
     });
     return lines.join('\n');
+  }
+
+  function buildEmailReportText(){
+    const equipe = usuariosDoRelatorio();
+    const mk = currentMonthKey();
+    const equipeUids = new Set(equipe.map(x => x.uid));
+    const pres = countPresencas(p => equipeUids.has(p.usuario_uid) && p.data_formatada.slice(0,7)===mk);
+    const pendentes = DB.solicitacoes.filter(s => s.status==='Pendente' && equipeUids.has(s.usuario_uid)).length;
+    return [
+      'Olá,',
+      '',
+      'Segue o Relatório de Presença e Escala Vivo, gerado em '+fmtDate(todayISO())+'.',
+      'Equipe no relatório: '+equipe.length+' pessoa(s).',
+      'Marcações no mês: '+pres._total+'. Solicitações pendentes: '+pendentes+'.',
+      '',
+      'O PDF anexo detalha cada técnico, incluindo matrícula, Supervisor ou Coordenador responsável, cidade de atuação, PHT e próxima escala prevista.',
+      '',
+      'Atenciosamente,',
+      'Presença Vivo'
+    ].join('\n');
   }
 
   function svgBarChart(items, opts){
@@ -1045,10 +1170,13 @@
 
   function buildReportHTML(){
     const mk = currentMonthKey();
-    const solAll = countSolicitacoes(()=>true);
-    const presAllMonth = countPresencas(p => p.data_formatada.slice(0,7) === mk);
-    const ativos = DB.usuarios.filter(x => x.status_ativo).length;
-    const ferias = DB.usuarios.filter(x => x.status_ferias).length;
+    const equipe = usuariosDoRelatorio();
+    const equipeUids = new Set(equipe.map(x => x.uid));
+    const solAll = countSolicitacoes(s => equipeUids.has(s.usuario_uid));
+    const presAllMonth = countPresencas(p => equipeUids.has(p.usuario_uid) && p.data_formatada.slice(0,7) === mk);
+    const ativos = equipe.filter(x => x.status_ativo).length;
+    const ferias = equipe.filter(x => x.status_ferias).length;
+    const isoHoje = todayISO();
 
     const presItems = TIPOS_PRESENCA
       .map((t,i) => ({label: t+' · '+TIPO_LABEL[t], value: presAllMonth[t]||0, color: PALETA[i % PALETA.length]}))
@@ -1060,21 +1188,26 @@
       {label:'Recusadas', value: solAll.Recusado, color:'#D90000'},
     ];
 
-    const teamRows = DB.usuarios.map((x,i) => {
+    const teamRows = equipe.map((x,i) => {
       const c = countPresencas(p => p.usuario_uid===x.uid && p.data_formatada.slice(0,7)===mk);
       return {label: x.nome_completo+' ('+x.cargo+')', value: c._total, color: PALETA[i % PALETA.length]};
     }).filter(r => r.value >= 0);
 
-    const pend = DB.solicitacoes.filter(s => s.status === 'Pendente');
+    const pend = DB.solicitacoes.filter(s => s.status === 'Pendente' && equipeUids.has(s.usuario_uid));
     const pendRows = pend.length ? pend.map(s => {
       const r = getUser(s.usuario_uid);
       return `<tr><td>${esc(r?r.nome_completo:s.usuario_nome)}</td><td>${esc(s.tipo_solicitacao)}${s.urgencia?' ('+esc(s.urgencia)+')':''}</td><td>${fmtDate(s.data_inicio)} a ${fmtDate(s.data_termino)}</td></tr>`;
     }).join('') : `<tr><td colspan="3">Nenhuma pendência no momento.</td></tr>`;
 
-    const escalaRows = DB.escalas.length ? DB.escalas.slice().sort((a,b)=>b.data_fim_semana.localeCompare(a.data_fim_semana)).map(e => {
-      const nomes = e.escalados.map(id => { const p=getUser(id); return p?p.nome_completo:'?'; }).join(', ') || 'ninguém escalado';
-      return `<tr><td>${fmtDate(e.data_fim_semana)}</td><td>${esc(nomes)}</td></tr>`;
-    }).join('') : `<tr><td colspan="2">Nenhuma escala registrada.</td></tr>`;
+    const escalaLinhas = DB.escalas.slice().sort((a,b)=>b.data_fim_semana.localeCompare(a.data_fim_semana)).map(e => {
+      const nomes = e.escalados.filter(id => equipeUids.has(id)).map(id => { const p=getUser(id); return p?p.nome_completo:'?'; }).join(', ');
+      return nomes ? `<tr><td>${fmtDate(e.data_fim_semana)}</td><td>${esc(nomes)}</td></tr>` : '';
+    }).filter(Boolean);
+    const escalaRows = escalaLinhas.length ? escalaLinhas.join('') : `<tr><td colspan="2">Nenhuma escala registrada para esta equipe.</td></tr>`;
+    const tecnicoRows = equipe.filter(x=>x.cargo==='Técnico').sort((a,b)=>a.nome_completo.localeCompare(b.nome_completo)).map(t => {
+      const responsavel = supervisorDo(t);
+      return `<tr><td>${esc(t.nome_completo)}</td><td>${esc(t.matricula||t.login||'—')}</td><td>${esc(responsavel?responsavel.nome_completo+' · '+responsavel.cargo:'Não definido')}</td><td>${esc(descricaoCidadeTecnico(t, isoHoje))}</td><td>${esc(t.pht||'Não informado')}</td><td>${esc(proximaEscalaPHT(t.pht))}</td></tr>`;
+    }).join('') || `<tr><td colspan="6">Nenhum técnico na equipe selecionada.</td></tr>`;
 
     return `<!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="UTF-8">
@@ -1118,7 +1251,7 @@
   <div class="card">
     <h2>Equipe</h2>
     <div class="stat-grid">
-      <div class="stat-box"><div class="stat-num">${equipeVisivel.length}</div><div class="stat-label">Na equipe</div></div>
+      <div class="stat-box"><div class="stat-num">${equipe.length}</div><div class="stat-label">Na equipe</div></div>
       <div class="stat-box"><div class="stat-num">${ativos}</div><div class="stat-label">Ativos</div></div>
       <div class="stat-box"><div class="stat-num">${ferias}</div><div class="stat-label">Em férias</div></div>
     </div>
@@ -1147,6 +1280,12 @@
   <div class="card">
     <h2>Escalas de plantão de fim de semana</h2>
     <table><thead><tr><th>Fim de semana</th><th>Escalados</th></tr></thead><tbody>${escalaRows}</tbody></table>
+  </div>
+
+  <div class="card">
+    <h2>Detalhamento dos técnicos — ${fmtDate(isoHoje)}</h2>
+    <p style="margin:0 0 12px;color:var(--ink-soft);font-size:12px;">A próxima escala PHT é calculada automaticamente para PHT 2120 e 2130. Os demais PHTs permanecem informativos até que a regra de escala seja definida.</p>
+    <table><thead><tr><th>Técnico</th><th>Matrícula</th><th>Supervisor / Coordenador</th><th>Cidade de atuação</th><th>PHT</th><th>Próxima escala PHT</th></tr></thead><tbody>${tecnicoRows}</tbody></table>
   </div>
 
   <div class="actions">
@@ -1193,7 +1332,7 @@
       {route:'solicitacoes', label:'Pedidos', icon:ICONS.list},
       {route:'nova', label:'Nova', icon:ICONS.plus},
     ];
-    if(u.cargo==='Supervisor' || u.role==='Administrador') items.push({route:'admin', label:'Gestão', icon:ICONS.shield, badge:nPend});
+    if(ehLider(u) || u.role==='Administrador') items.push({route:'admin', label:'Gestão', icon:ICONS.shield, badge:nPend});
     return `
       <nav class="bottom-nav">
         ${items.map(it => `
@@ -1228,7 +1367,7 @@
         <div style="padding:18px 20px 14px;">
           <div style="font-size:11px;font-family:var(--mono);color:var(--stamp);text-transform:uppercase;letter-spacing:.08em;font-weight:700;">Perfil Vivo</div>
           <div style="font-size:20px;font-weight:800;color:var(--ink);margin-top:3px;">${esc(u.nome_completo)}</div>
-          <div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">${esc(u.cargo || '')}${u.cargo!=='Supervisor' && supervisorDo(u) ? ' · Supervisor: '+esc(supervisorDo(u).nome_completo) : (u.cargo==='Supervisor' ? ' · Equipe: '+equipeDoSupervisor(u.uid).length : '')}</div>
+          <div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">${esc(u.cargo || '')}${!ehLider(u) && supervisorDo(u) ? ' · Responsável: '+esc(supervisorDo(u).nome_completo) : (ehLider(u) ? ' · Equipe: '+equipeDoSupervisor(u.uid).length : '')}</div>
         </div>
       </div>
     `;
@@ -1238,7 +1377,8 @@
     const perfis = [
       {cargo:'Assistente', icon:'👤', desc:'Acesso à sua presença e solicitações'},
       {cargo:'Técnico', icon:'🛠️', desc:'Presença, solicitações e informações de campo'},
-      {cargo:'Supervisor', icon:'🛡️', desc:'Visão de equipe, solicitações e escala'}
+      {cargo:'Supervisor', icon:'🛡️', desc:'Visão de equipe, solicitações e escala'},
+      {cargo:'Coordenador', icon:'📋', desc:'Visão de equipe, solicitações e escala'}
     ];
     const cards = perfis.map(p => `
       <button class="profile-choice" data-perfil="${p.cargo}" type="button">
@@ -1322,7 +1462,7 @@
 
   function tiposParaDia(u, dateObj){
     const weekend = isWeekend(dateObj);
-    if(u.cargo==='Técnico' || u.cargo==='Supervisor'){
+    if(u.cargo==='Técnico' || ehLider(u)){
       return weekend ? ['P','PC','PM','CM','ED','TR','MR','NP','BH','DF','AT'] : TIPOS_PRESENCA_TECNICO;
     }
     return TIPOS_PRESENCA_ASSISTENTE;
@@ -1330,7 +1470,7 @@
 
 
   function datasPHT(pht){
-    if(!pht) return [];
+    if(!['2120','2130'].includes(String(pht||''))) return [];
     const inicio = pht==='2120' ? new Date('2026-08-14T12:00:00') : new Date('2026-08-21T12:00:00');
     const fim = new Date('2026-12-31T23:59:59');
     const datas = [];
@@ -1349,6 +1489,7 @@
   function renderEscalaPHT(u){
     if(u.cargo!=='Técnico' || !u.pht) return '';
     const datas = datasPHT(u.pht);
+    if(!datas.length) return `<div class="card"><h2>Escala PHT ${esc(u.pht)}</h2><p class="page-sub">Código PHT ${esc(u.pht)} cadastrado. A programação quinzenal desta tela é aplicada apenas aos grupos 2120 e 2130.</p></div>`;
     const hoje = todayISO();
     const proximas = datas.filter(d => d>=hoje);
     const exibidas = proximas.length ? proximas : datas;
@@ -1416,7 +1557,7 @@
     const today = new Date();
     const iso = todayISO();
     const weekend = isWeekend(today);
-    const canPlantao = weekend && (u.cargo==='Técnico' || u.cargo==='Supervisor');
+    const canPlantao = weekend && (u.cargo==='Técnico' || ehLider(u));
     const canWeekendAssistente = weekend && u.cargo==='Assistente';
     const canMarkToday = !weekend || canPlantao || canWeekendAssistente;
     const existing = DB.presencas[u.uid+'_'+iso];
@@ -1426,7 +1567,7 @@
       cardBody = `<p class="empty-note">Hoje não há escala ativa para seu perfil.</p>`;
     } else {
       let opts;
-      if(u.cargo==='Técnico' || u.cargo==='Supervisor'){
+      if(u.cargo==='Técnico' || ehLider(u)){
         // Técnicos têm suas opções específicas todos os dias; no fim de semana, plantão completo/parcial também ficam disponíveis
         opts = weekend ? ['P','PC','PM','CM','ED','TR','MR'] : TIPOS_PRESENCA_TECNICO;
       } else if(weekend && canWeekendAssistente){
@@ -1457,7 +1598,7 @@
 
     const mk = currentMonthKey();
     const myCounts = countPresencas(p => p.usuario_uid===u.uid && p.data_formatada.slice(0,7)===mk);
-    const relevantTipos = (u.cargo==='Técnico'||u.cargo==='Supervisor') ? TIPOS_PRESENCA : TIPOS_PRESENCA_ASSISTENTE;
+    const relevantTipos = (u.cargo==='Técnico'||ehLider(u)) ? TIPOS_PRESENCA : TIPOS_PRESENCA_ASSISTENTE;
     const mySol = countSolicitacoes(s => s.usuario_uid===u.uid);
 
     const cidadeAtual = (DB.cidades_trabalho||{})[u.uid+'_'+iso] || '';
@@ -1565,11 +1706,11 @@
   }
 
   function renderAdmin(u){
-    if(u.cargo!=='Supervisor' && u.role!=='Administrador') return '<h1 class="page-title">Acesso restrito</h1><p class="page-sub">Seu perfil não possui permissão para esta área.</p>';
+    if(!ehLider(u) && u.role!=='Administrador') return '<h1 class="page-title">Acesso restrito</h1><p class="page-sub">Seu perfil não possui permissão para esta área.</p>';
     if(u.role!=='Administrador' && adminTab==='usuarios') adminTab='resumo';
     const effectiveTab = adminTab;
     // Supervisores enxergam e analisam apenas a própria equipe. Administrador continua gerenciando cadastros.
-    const equipeVisivel = u.role==='Administrador' ? DB.usuarios.slice() : (u.cargo==='Supervisor' ? [u, ...equipeDoSupervisor(u.uid)] : DB.usuarios.slice());
+    const equipeVisivel = u.role==='Administrador' ? DB.usuarios.slice() : (ehLider(u) ? [u, ...equipeDoSupervisor(u.uid)] : DB.usuarios.slice());
     const equipeUids = new Set(equipeVisivel.map(x => x.uid));
     const nResetsPend = (DB.resets||[]).filter(r => r.status==='Pendente').length;
 
@@ -1650,13 +1791,13 @@
           </div>
         </div>
         <div class="card">
-          <h2>Relatório de presença com gráficos, por email</h2>
-          <p class="page-sub" style="margin-bottom:12px;">Como o email não permite anexar arquivos automaticamente por aqui, o envio é feito em 2 passos rápidos:</p>
+          <h2>Relatório completo da equipe, por e-mail</h2>
+          <p class="page-sub" style="margin-bottom:12px;">O relatório inclui presença, solicitações, escala e o detalhamento de cada técnico: responsável, cidade de atuação, PHT e próxima escala prevista.</p>
           <label>Passo 1 — Gerar o relatório com gráficos</label>
-          <p class="page-sub" style="margin:0 0 10px;">Abre o relatório visual (gráficos de presença, solicitações e escalas) em uma nova aba e já chama a tela de impressão — escolha "Salvar como PDF".</p>
-          <button class="btn-ghost" id="btn-view-report" type="button">1. Ver relatório com gráficos e salvar PDF</button>
+          <p class="page-sub" style="margin:0 0 10px;">Abre o relatório visual em uma nova aba e já chama a tela de impressão — escolha "Salvar como PDF".</p>
+          <button class="btn-ghost" id="btn-view-report" type="button">1. Gerar relatório completo e salvar PDF</button>
           <label style="margin-top:20px;">Passo 2 — Enviar por email</label>
-          <p class="page-sub" style="margin:0 0 10px;">Abre seu programa de email com o resumo em texto pronto. Anexe o PDF salvo no passo 1 antes de enviar.</p>
+          <p class="page-sub" style="margin:0 0 10px;">Abre seu programa de e-mail com o resumo completo pronto. Anexe o PDF salvo no passo 1 antes de enviar.</p>
           <input type="text" id="f-email-to" placeholder="nome@empresa.com">
           <button class="btn-primary" id="btn-email-report">2. Abrir email para enviar</button>
         </div>
@@ -1684,14 +1825,14 @@
     }
 
     if(effectiveTab==='escala'){
-      const elegiveis = equipeVisivel.filter(x => x.status_ativo && (x.cargo==='Técnico' || x.cargo==='Supervisor'));
+      const elegiveis = equipeVisivel.filter(x => x.status_ativo && (x.cargo==='Técnico' || ehLider(x)));
       const nextSat = nextSaturdayISO();
       content = `
         <div class="card">
           <h2>Montar escala de fim de semana</h2>
           <label>Sábado de referência</label>
           <input type="date" id="f-escala-data" value="${nextSat}">
-          <label>${u.role==='Administrador'?'Equipe elegível (todos os técnicos e supervisores)':'Equipe elegível (meus técnicos e eu)'}</label>
+          <label>${u.role==='Administrador'?'Equipe elegível (técnicos, supervisores e coordenadores)':'Equipe elegível (minha equipe e eu)'}</label>
           <div class="escala-grid">
             ${elegiveis.map(x => `
               <label class="check-row" style="text-transform:none;font-family:var(--sans);letter-spacing:0;">
@@ -1731,8 +1872,8 @@
             </div>`).join('') : `<p class="empty-note">Nenhuma solicitação pendente.</p>`}
         </div>
       `;
-      const supervisores = DB.usuarios.filter(x => x.cargo==='Supervisor' && x.status_ativo);
-      const optionsSup = supervisores.map(sup => `<option value="${sup.uid}">${esc(sup.nome_completo)} · ${esc(sup.matricula||sup.login||'')}</option>`).join('');
+      const responsaveis = DB.usuarios.filter(x => ehLider(x) && x.status_ativo);
+      const optionsSup = responsaveis.map(sup => `<option value="${sup.uid}">${esc(sup.nome_completo)} · ${esc(sup.cargo)} · ${esc(sup.matricula||sup.login||'')}</option>`).join('');
       content = resetsCard + `
         <div class="card">
           <h2>Cadastrar usuário <span style="font-weight:500;color:var(--ink-soft);">(${DB.usuarios.length}/1000)</span></h2>
@@ -1746,10 +1887,11 @@
               <option value="Assistente">Assistente</option>
               <option value="Técnico">Técnico</option>
               <option value="Supervisor">Supervisor</option>
+              <option value="Coordenador">Coordenador</option>
             </select>
             <div id="nu-supervisor-wrap">
-              <label>Supervisor responsável</label>
-              <select id="nu-supervisor"><option value="">Selecione o supervisor</option>${optionsSup}</select>
+              <label>Supervisor ou Coordenador responsável</label>
+              <select id="nu-supervisor"><option value="">Selecione o responsável</option>${optionsSup}</select>
             </div>
             <div id="nu-pht-wrap" style="display:none;">
               <label>PHT do Técnico</label>
@@ -1757,6 +1899,9 @@
                 <option value="">Selecione o PHT</option>
                 <option value="2120">PHT 2120 · Escala inicia 14/08/2026</option>
                 <option value="2130">PHT 2130 · Escala inicia 21/08/2026</option>
+                <option value="1700">PHT 1700</option>
+                <option value="1800">PHT 1800</option>
+                <option value="3522">PHT 3522</option>
               </select>
               <div class="u-tags" style="margin-top:6px;">A escala PHT é quinzenal e alternada até dezembro de 2026.</div>
             </div>
@@ -1784,18 +1929,18 @@
         </div>
         <div class="card">
           <h2>Usuários e equipes (${DB.usuarios.length}/1000)</h2>
-          <p class="page-sub" style="margin-bottom:12px;">Cadastre nome completo e login (matrícula). Técnicos e Assistentes devem ficar vinculados ao Supervisor responsável.</p>
+          <p class="page-sub" style="margin-bottom:12px;">Cadastre nome completo e login (matrícula). Técnicos e Assistentes devem ficar vinculados a um Supervisor ou Coordenador responsável.</p>
           ${DB.usuarios.map(x => {
             const sup = supervisorDo(x);
             return `
             <div class="u-row" style="align-items:flex-start;gap:12px;">
               <div style="min-width:0;flex:1;">
                 <div class="u-name"><span class="status-dot ${x.status_ativo?'on':'off'}"></span>${esc(x.nome_completo)}</div>
-                <div class="u-tags">Matrícula: ${esc(x.matricula||x.login||'—')} · ${esc(x.cargo)} · ${esc(x.role)}${x.cargo==='Técnico'&&x.pht?' · PHT '+esc(x.pht):''}${x.status_ferias?' · em férias':''}</div>
-                ${x.cargo!=='Supervisor' ? `<div class="u-tags" style="margin-top:5px;">Supervisor: <strong>${sup?esc(sup.nome_completo):'Não definido'}</strong></div>
+                <div class="u-tags">Matrícula: ${esc(x.matricula||x.login||'—')} · ${esc(x.cargo)} · ${esc(x.role)}${x.pht?' · PHT '+esc(x.pht):''}${x.status_origem&&x.status_origem!=='ATIVO'?' · '+esc(x.status_origem):''}${x.status_ferias?' · em férias':''}</div>
+                ${!ehLider(x) ? `<div class="u-tags" style="margin-top:5px;">Responsável: <strong>${sup?esc(sup.nome_completo):'Não definido'}</strong></div>
                   <select data-team-user="${x.uid}" style="margin-top:7px;max-width:300px;padding:7px 9px;font-size:12px;">
-                    <option value="">Sem supervisor</option>
-                    ${supervisores.map(sp => `<option value="${sp.uid}" ${x.supervisor_uid===sp.uid?'selected':''}>${esc(sp.nome_completo)} · ${esc(sp.matricula||sp.login||'')}</option>`).join('')}
+                    <option value="">Sem responsável</option>
+                    ${responsaveis.map(sp => `<option value="${sp.uid}" ${x.supervisor_uid===sp.uid?'selected':''}>${esc(sp.nome_completo)} · ${esc(sp.cargo)} · ${esc(sp.matricula||sp.login||'')}</option>`).join('')}
                   </select>` : `<div class="u-tags" style="margin-top:5px;">Equipe: ${equipeDoSupervisor(x.uid).length} pessoa(s)</div>`}
               </div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
@@ -2022,7 +2167,7 @@
       btnEmail.addEventListener('click', () => {
         const to = document.getElementById('f-email-to').value.trim();
         const subject = 'Relatório de Presença e Escala Vivo - ' + fmtDate(todayISO());
-        const body = buildReportText();
+        const body = buildEmailReportText();
         const url = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         window.open(url, '_blank');
       });
@@ -2077,13 +2222,13 @@
         if(!nome || !senha || !matricula){ showToast('Preencha nome, matrícula e senha.'); return; }
         if(!isMatriculaValida(matricula)){ showToast('Matrícula inválida. Use A0... ou G seguido de números, conforme a matrícula corporativa.'); return; }
         if(DB.usuarios.some(x => (x.matricula||x.login||'').toUpperCase()===matricula)){ showToast('Esta matrícula já está cadastrada.'); return; }
-        if(cargo!=='Supervisor' && !supervisorUid){ showToast('Selecione o supervisor responsável.'); return; }
-        if(cargo==='Técnico' && !['2120','2130'].includes(pht)){ showToast('Selecione o PHT 2120 ou PHT 2130 do técnico.'); return; }
+        if(!['Supervisor','Coordenador'].includes(cargo) && !supervisorUid){ showToast('Selecione o Supervisor ou Coordenador responsável.'); return; }
+        if(cargo==='Técnico' && !phtValido(pht)){ showToast('Selecione um PHT válido do técnico.'); return; }
         DB.usuarios.push({
           uid: uid(), nome_completo: nome, matricula:matricula, login:matricula,
           cargo: cargo,
           role: 'Comum',
-          supervisor_uid: cargo==='Supervisor' ? null : supervisorUid,
+          supervisor_uid: ['Supervisor','Coordenador'].includes(cargo) ? null : supervisorUid,
           pht: cargo==='Técnico' ? pht : null,
           status_ativo:true, status_ferias:false, email:'', senha:senha, senha_provisoria:true
         });
@@ -2098,7 +2243,7 @@
     const phtWrapNovo = document.getElementById('nu-pht-wrap');
     if(cargoNovo && supWrapNovo){
       const syncCadastro = () => {
-        supWrapNovo.style.display = cargoNovo.value==='Supervisor' ? 'none' : 'block';
+        supWrapNovo.style.display = ['Supervisor','Coordenador'].includes(cargoNovo.value) ? 'none' : 'block';
         if(phtWrapNovo) phtWrapNovo.style.display = cargoNovo.value==='Técnico' ? 'block' : 'none';
       };
       cargoNovo.addEventListener('change', syncCadastro); syncCadastro();
@@ -2115,12 +2260,12 @@
         if(DB.usuarios.some(x => x.uid!==target.uid && String(x.matricula||x.login||'').toUpperCase()===novaMat)){ showToast('Esta matrícula já está cadastrada.'); return; }
         const novoNome = (window.prompt('Nome completo:', target.nome_completo) || '').trim();
         if(!novoNome) return;
-        let novoCargo = (window.prompt('Cargo: Assistente, Técnico ou Supervisor', target.cargo) || '').trim();
-        if(!['Assistente','Técnico','Supervisor'].includes(novoCargo)){ showToast('Cargo inválido.'); return; }
+        let novoCargo = (window.prompt('Cargo: Assistente, Técnico, Supervisor ou Coordenador', target.cargo) || '').trim();
+        if(!['Assistente','Técnico','Supervisor','Coordenador'].includes(novoCargo)){ showToast('Cargo inválido.'); return; }
         let novoPht = null;
         if(novoCargo==='Técnico'){
-          novoPht = (window.prompt('PHT do técnico: 2120 ou 2130', target.pht||'2120') || '').trim();
-          if(!['2120','2130'].includes(novoPht)){ showToast('PHT inválido. Use 2120 ou 2130.'); return; }
+          novoPht = (window.prompt('PHT do técnico: 1700, 1800, 2120, 2130 ou 3522', target.pht||'2120') || '').trim();
+          if(!phtValido(novoPht)){ showToast('PHT inválido. Use 1700, 1800, 2120, 2130 ou 3522.'); return; }
         }
         target.nome_completo = novoNome;
         target.matricula = novaMat;
@@ -2134,7 +2279,7 @@
           target.supervisor_uid = null;
         } else {
           target.role = 'Comum';
-          if(novoCargo==='Supervisor') target.supervisor_uid = null;
+          if(['Supervisor','Coordenador'].includes(novoCargo)) target.supervisor_uid = null;
         }
         await saveDB();
         showToast('Perfil atualizado.');
@@ -2145,10 +2290,10 @@
     document.querySelectorAll('[data-team-user]').forEach(sel => {
       sel.addEventListener('change', async () => {
         const target = getUser(sel.dataset.teamUser);
-        if(!target || target.cargo==='Supervisor') return;
+        if(!target || ehLider(target)) return;
         target.supervisor_uid = sel.value || null;
         await saveDB();
-        showToast(target.supervisor_uid ? 'Supervisor da equipe atualizado.' : 'Usuário ficou sem supervisor.');
+        showToast(target.supervisor_uid ? 'Responsável da equipe atualizado.' : 'Usuário ficou sem responsável.');
         render();
       });
     });
