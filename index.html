@@ -12,8 +12,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Presença Vivo">
   <meta name="format-detection" content="telephone=no">
-  <link rel="icon" type="image/png" href="vivo-cluster-vitoria-es-icon.png">
-  <link rel="apple-touch-icon" href="vivo-cluster-vitoria-es-icon.png">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23660099'/%3E%3Cstop offset='1' stop-color='%23EB0029'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Cpath d='M27 50l16 16 30-30' stroke='%23fff' stroke-width='9' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23660099'/%3E%3Cstop offset='1' stop-color='%23EB0029'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23g)'/%3E%3Cpath d='M27 50l16 16 30-30' stroke='%23fff' stroke-width='9' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="manifest" href="manifest.webmanifest">
   <script>
     if ('serviceWorker' in navigator) {
@@ -990,10 +990,6 @@
 
   function getUser(u){ return DB.usuarios.find(x => x.uid === u); }
   function currentUser(){ return getUser(currentUid); }
-  // Aceita matrícula digitada com espaço, hífen ou letras minúsculas, sem alterar o login salvo.
-  function normalizaMatricula(v){
-    return String(v||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/^AO/, 'A0');
-  }
   function isMatriculaValida(v){ return /^(A0|G[0-9])[A-Z0-9]+$/.test(String(v||'').trim().toUpperCase()); }
   // Coordenador possui as mesmas permissões operacionais de um Supervisor.
   function ehLider(usuario){ return !!usuario && (usuario.cargo==='Supervisor' || usuario.cargo==='Coordenador'); }
@@ -1036,11 +1032,11 @@
     return counts;
   }
 
-  // Administrador recebe o relatório completo. Supervisor e Coordenador recebem somente os membros vinculados à sua equipe.
+  // Administrador recebe o relatório completo. Supervisor e Coordenador recebem somente sua equipe.
   function usuariosDoRelatorio(){
     const u = currentUser();
     if(!u || u.role==='Administrador') return DB.usuarios.slice();
-    return ehLider(u) ? equipeDoSupervisor(u.uid) : [u];
+    return ehLider(u) ? [u, ...equipeDoSupervisor(u.uid)] : [u];
   }
 
   function proximaEscalaPHT(pht){
@@ -1107,7 +1103,6 @@
   }
 
   function buildEmailReportText(){
-    const responsavel = currentUser();
     const equipe = usuariosDoRelatorio();
     const mk = currentMonthKey();
     const equipeUids = new Set(equipe.map(x => x.uid));
@@ -1117,7 +1112,6 @@
       'Olá,',
       '',
       'Segue o Relatório de Presença e Escala Vivo, gerado em '+fmtDate(todayISO())+'.',
-      responsavel && responsavel.role!=='Administrador' ? 'Escopo: somente a equipe vinculada a '+responsavel.nome_completo+'.' : 'Escopo: visão consolidada de todas as equipes.',
       'Equipe no relatório: '+equipe.length+' pessoa(s).',
       'Marcações no mês: '+pres._total+'. Solicitações pendentes: '+pendentes+'.',
       '',
@@ -1264,18 +1258,33 @@
   </div>
 
   <div class="card">
-    <h2>Resumo de presença e solicitações</h2>
-    <div class="stat-grid">
-      <div class="stat-box"><div class="stat-num">${presAllMonth._total}</div><div class="stat-label">Marcações no mês</div></div>
-      <div class="stat-box"><div class="stat-num">${solAll.Pendente}</div><div class="stat-label">Pendentes</div></div>
-      <div class="stat-box"><div class="stat-num">${solAll.Aprovado}</div><div class="stat-label">Aprovadas</div></div>
-      <div class="stat-box"><div class="stat-num">${solAll.Recusado}</div><div class="stat-label">Recusadas</div></div>
-    </div>
+    <h2>Presenças do mês por tipo (equipe toda)</h2>
+    ${presItems.length ? svgBarChart(presItems) : '<p style="color:var(--ink-soft);font-size:13px;">Sem marcações registradas neste mês.</p>'}
   </div>
 
   <div class="card">
-    <h2>Relação dos técnicos — ${fmtDate(isoHoje)}</h2>
-    <p style="margin:0 0 9px;color:var(--ink-soft);font-size:11px;">Relatório resumido em uma página. A escala PHT é automática para 2120 e 2130; os demais PHTs permanecem informativos.</p>
+    <h2>Solicitações por status</h2>
+    ${svgDonutChart(solItems)}
+  </div>
+
+  <div class="card">
+    <h2>Total de marcações por pessoa (mês)</h2>
+    ${teamRows.length ? svgBarChart(teamRows) : '<p style="color:var(--ink-soft);font-size:13px;">Nenhum registro ainda.</p>'}
+  </div>
+
+  <div class="card">
+    <h2>Solicitações pendentes de análise</h2>
+    <table><thead><tr><th>Nome</th><th>Tipo</th><th>Período</th></tr></thead><tbody>${pendRows}</tbody></table>
+  </div>
+
+  <div class="card">
+    <h2>Escalas de plantão de fim de semana</h2>
+    <table><thead><tr><th>Fim de semana</th><th>Escalados</th></tr></thead><tbody>${escalaRows}</tbody></table>
+  </div>
+
+  <div class="card">
+    <h2>Detalhamento dos técnicos — ${fmtDate(isoHoje)}</h2>
+    <p style="margin:0 0 12px;color:var(--ink-soft);font-size:12px;">A próxima escala PHT é calculada automaticamente para PHT 2120 e 2130. Os demais PHTs permanecem informativos até que a regra de escala seja definida.</p>
     <table><thead><tr><th>Técnico</th><th>Matrícula</th><th>Supervisor / Coordenador</th><th>Cidade de atuação</th><th>PHT</th><th>Próxima escala PHT</th></tr></thead><tbody>${tecnicoRows}</tbody></table>
   </div>
 
@@ -1701,7 +1710,7 @@
     if(u.role!=='Administrador' && adminTab==='usuarios') adminTab='resumo';
     const effectiveTab = adminTab;
     // Supervisores enxergam e analisam apenas a própria equipe. Administrador continua gerenciando cadastros.
-    const equipeVisivel = u.role==='Administrador' ? DB.usuarios.slice() : (ehLider(u) ? equipeDoSupervisor(u.uid) : []);
+    const equipeVisivel = u.role==='Administrador' ? DB.usuarios.slice() : (ehLider(u) ? [u, ...equipeDoSupervisor(u.uid)] : DB.usuarios.slice());
     const equipeUids = new Set(equipeVisivel.map(x => x.uid));
     const nResetsPend = (DB.resets||[]).filter(r => r.status==='Pendente').length;
 
@@ -1715,10 +1724,10 @@
     let content = '';
     if(effectiveTab==='resumo'){
       const mk = currentMonthKey();
-      const solAll = countSolicitacoes(s => equipeUids.has(s.usuario_uid));
+      const solAll = countSolicitacoes(()=>true);
       const presAllMonth = countPresencas(p => equipeUids.has(p.usuario_uid) && p.data_formatada.slice(0,7)===mk);
 
-      const ativos = equipeVisivel.filter(x => x.status_ativo).length;
+      const ativos = DB.usuarios.filter(x => x.status_ativo).length;
       const emFerias = equipeVisivel.filter(x => x.status_ferias).length;
 
       const isoHoje = todayISO();
@@ -1744,7 +1753,7 @@
         <div class="card">
           <div class="stat-sec-title">Equipe</div>
           <div class="stat-grid">
-            <div class="stat-box"><div class="stat-num">${equipeVisivel.length}</div><div class="stat-label">Na equipe</div></div>
+            <div class="stat-box"><div class="stat-num">${DB.usuarios.length}</div><div class="stat-label">Cadastrados</div></div>
             <div class="stat-box"><div class="stat-num">${ativos}</div><div class="stat-label">Ativos</div></div>
             <div class="stat-box"><div class="stat-num">${emFerias}</div><div class="stat-label">Em férias</div></div>
           </div>
@@ -1782,11 +1791,11 @@
           </div>
         </div>
         <div class="card">
-          <h2>Relatório resumido da equipe, por e-mail</h2>
-          <p class="page-sub" style="margin-bottom:12px;">O relatório é gerado em uma única página e traz os técnicos visíveis neste perfil: responsável, cidade de atuação, PHT e próxima escala prevista.</p>
+          <h2>Relatório completo da equipe, por e-mail</h2>
+          <p class="page-sub" style="margin-bottom:12px;">O relatório inclui presença, solicitações, escala e o detalhamento de cada técnico: responsável, cidade de atuação, PHT e próxima escala prevista.</p>
           <label>Passo 1 — Gerar o relatório com gráficos</label>
           <p class="page-sub" style="margin:0 0 10px;">Abre o relatório visual em uma nova aba e já chama a tela de impressão — escolha "Salvar como PDF".</p>
-          <button class="btn-ghost" id="btn-view-report" type="button">1. Gerar relatório resumido e salvar PDF</button>
+          <button class="btn-ghost" id="btn-view-report" type="button">1. Gerar relatório completo e salvar PDF</button>
           <label style="margin-top:20px;">Passo 2 — Enviar por email</label>
           <p class="page-sub" style="margin:0 0 10px;">Abre seu programa de e-mail com o resumo completo pronto. Anexe o PDF salvo no passo 1 antes de enviar.</p>
           <input type="text" id="f-email-to" placeholder="nome@empresa.com">
@@ -1977,18 +1986,16 @@
     if(form){
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const login = normalizaMatricula(document.getElementById('f-login').value);
+        const login = document.getElementById('f-login').value.trim().toUpperCase();
         const val = document.getElementById('f-senha').value;
         const perfil = pendingUid;
-        // A matrícula identifica o usuário; o perfil escolhido só é usado como orientação.
-        // Isso evita bloquear técnico por variações antigas de cadastro/perfil.
-        const u = DB.usuarios.find(x => normalizaMatricula(x.matricula||x.login)===login && x.status_ativo);
+        const u = perfil && perfil.candidatos.find(x => (x.matricula||x.login||'').toUpperCase()===login && x.cargo===perfil.cargo);
         if(u && u.status_ativo && val === u.senha){
           currentUid = u.uid; pendingUid = null;
           route = u.senha_provisoria ? 'trocar-senha' : 'home';
           render();
         } else {
-          showToast('Matrícula ou senha incorretas. Confira a matrícula e tente novamente.');
+          showToast('Matrícula ou senha incorretas para o perfil selecionado.');
           document.getElementById('f-senha').value = '';
         }
       });
