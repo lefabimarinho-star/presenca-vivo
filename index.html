@@ -1531,6 +1531,36 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
     return changed;
   }
 
+
+  function cadastrarAssistentesOficiais20260921(){
+    if(DB.assistentes_oficiais_versao>=1) return false;
+    let changed=false;
+    const lista=[
+      ['A0069989','CAMILLA NERI DE SOUZA'],
+      ['A0167564','PATRICK FEU RAMOS'],
+      ['G3530834','ROBERT PEDRONI MARTINS'],
+      ['G3545007','LUCIANO OLIVEIRA SILVA']
+    ];
+    lista.forEach(([mat,nome])=>{
+      const key=String(mat).trim().toUpperCase();
+      let u=DB.usuarios.find(x=>String(x.matricula||x.login||'').trim().toUpperCase()===key);
+      if(!u){
+        DB.usuarios.push({uid:uid(),nome_completo:nome,matricula:key,login:key,cargo:'Assistente',
+          role:'Comum',supervisor_uid:null,status_ativo:true,status_ferias:false,email:'',
+          senha:'1234',senha_provisoria:true});
+        changed=true;
+      }else{
+        // Atualiza só os campos necessários. Não altera senha nem login já existentes.
+        if(u.nome_completo!==nome){u.nome_completo=nome;changed=true;}
+        if(u.matricula!==key){u.matricula=key;changed=true;}
+        if(u.cargo!=='Assistente'){u.cargo='Assistente';changed=true;}
+        if(u.status_ativo!==true){u.status_ativo=true;changed=true;}
+      }
+    });
+    DB.assistentes_oficiais_versao=1;
+    return changed;
+  }
+
   async function loadDB(){
     let isNew = false;
     let cloudNeedsSeed = false;
@@ -1584,6 +1614,7 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
     if(aplicarImportacaoTecnicos()) migrated = true;
     if(migrarSupervisores20260921()) migrated = true;
     if(normalizarSenhasTodosUsuarios()) migrated = true;
+    if(cadastrarAssistentesOficiais20260921()) migrated = true;
     if(isNew || migrated || cloudNeedsSeed) await saveDB();
   }
 
