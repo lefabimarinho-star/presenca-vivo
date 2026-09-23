@@ -1593,6 +1593,48 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
     return changed;
   }
 
+
+  function corrigirEquipeFabiano20260922(){
+    let changed=false;
+    const findMat=mat=>(DB.usuarios||[]).find(x=>
+      String(x.matricula||x.login||'').trim().toUpperCase()===String(mat).toUpperCase());
+
+    let fabiano=findMat('A0063915');
+    if(!fabiano){
+      fabiano={uid:uid(),nome_completo:'Fabiano Marinho da Silva',matricula:'A0063915',
+        login:'A0063915',cargo:'Administrador',role:'Administrador',supervisor_uid:null,
+        status_ativo:true,status_ferias:false,email:'',senha:'1234',senha_provisoria:false};
+      DB.usuarios.push(fabiano); changed=true;
+    }
+
+    const ensure=(mat,nome,cargo,supervisor_uid=null)=>{
+      let u=findMat(mat);
+      if(!u){
+        u={uid:uid(),nome_completo:nome,matricula:mat,login:mat,cargo,
+           role:'Comum',supervisor_uid,status_ativo:true,status_ferias:false,email:'',
+           senha:'1234',senha_provisoria:false};
+        DB.usuarios.push(u); changed=true;
+      }else{
+        // Deliberately do not touch u.senha or u.login.
+        const patch={nome_completo:nome,matricula:mat,cargo,status_ativo:true};
+        Object.entries(patch).forEach(([k,v])=>{if(u[k]!==v){u[k]=v;changed=true;}});
+        if(cargo==='Assistente' && u.supervisor_uid!==supervisor_uid){
+          u.supervisor_uid=supervisor_uid; changed=true;
+        }
+      }
+      return u;
+    };
+
+    ensure('A0069989','CAMILLA NERI DE SOUZA','Assistente',fabiano.uid);
+    ensure('A0167564','PATRICK FEU RAMOS','Assistente',fabiano.uid);
+    ensure('G3530834','ROBERT PEDRONI MARTINS','Assistente',fabiano.uid);
+    ensure('G3545007','LUCIANO OLIVEIRA SILVA','Assistente',fabiano.uid);
+    ensure('A0126240','Camila da Silva Torquato','Supervisor',null);
+
+    DB.equipe_fabiano_versao=2;
+    return changed;
+  }
+
   async function loadDB(){
     let isNew=false, migrated=false;
     let localVal=null, localTs=0, cloudVal=null, cloudTs=0;
@@ -1664,6 +1706,7 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
     if(normalizarSenhasTodosUsuarios()) migrated=true;
     if(cadastrarAssistentesOficiais20260921()) migrated=true;
     if(garantirLiderancasOficiais20260922()) migrated=true;
+    if(corrigirEquipeFabiano20260922()) migrated=true;
 
     // Se a cópia local é mais nova, não deixa a nuvem antiga sobrescrever a senha.
     if(isNew || migrated || (localVal && localTs>cloudTs)) await saveDB(true);
@@ -1744,6 +1787,7 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
             normalizarSenhasTodosUsuarios();
             cadastrarAssistentesOficiais20260921();
             garantirLiderancasOficiais20260922();
+            corrigirEquipeFabiano20260922();
 
             try{
               localStorage.setItem(KEY,JSON.stringify(DB));
