@@ -1515,25 +1515,21 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
   function normalizarSenhasTodosUsuarios(){
     let changed=false;
     DB.usuarios.forEach(u=>{
-      const senha=String(u.senha||'').trim();
-      if(!senha){
+      if(!String(u.senha||'').trim()){
         u.senha='1234';
-        if(u.senha_provisoria!==true) u.senha_provisoria=true;
         changed=true;
-      } else if(senha!=='1234' && u.senha_provisoria!==false){
+      }
+      // A senha existente é válida e permanente. A troca só ocorre quando o próprio
+      // usuário ou o administrador fizer uma alteração explícita.
+      if(u.senha_provisoria!==false){
         u.senha_provisoria=false;
-        changed=true;
-      } else if(senha==='1234' && u.senha_provisoria!==true){
-        u.senha_provisoria=true;
         changed=true;
       }
     });
     return changed;
   }
 
-
   function cadastrarAssistentesOficiais20260921(){
-    if(DB.assistentes_oficiais_versao>=1) return false;
     let changed=false;
     const lista=[
       ['A0069989','CAMILLA NERI DE SOUZA'],
@@ -1542,102 +1538,222 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
       ['G3545007','LUCIANO OLIVEIRA SILVA']
     ];
     lista.forEach(([mat,nome])=>{
-      const key=String(mat).trim().toUpperCase();
+      const key=mat.toUpperCase();
       let u=DB.usuarios.find(x=>String(x.matricula||x.login||'').trim().toUpperCase()===key);
       if(!u){
         DB.usuarios.push({uid:uid(),nome_completo:nome,matricula:key,login:key,cargo:'Assistente',
           role:'Comum',supervisor_uid:null,status_ativo:true,status_ferias:false,email:'',
-          senha:'1234',senha_provisoria:true});
+          senha:'1234',senha_provisoria:false});
         changed=true;
       }else{
-        // Atualiza só os campos necessários. Não altera senha nem login já existentes.
         if(u.nome_completo!==nome){u.nome_completo=nome;changed=true;}
         if(u.matricula!==key){u.matricula=key;changed=true;}
         if(u.cargo!=='Assistente'){u.cargo='Assistente';changed=true;}
         if(u.status_ativo!==true){u.status_ativo=true;changed=true;}
+        // Nunca altera senha/login existente.
+        if(u.senha_provisoria!==false){u.senha_provisoria=false;changed=true;}
       }
     });
-    DB.assistentes_oficiais_versao=1;
+    DB.assistentes_oficiais_versao=2;
+    return changed;
+  }
+
+
+  function garantirLiderancasOficiais20260922(){
+    let changed=false;
+    const oficiais=[
+      ['A0126240','Camila da Silva Torquato','Supervisor'],
+      ['A0133757','Gabriel Ferreira Maia','Supervisor'],
+      ['A0161825','Hilton Velten Gonçalves','Supervisor'],
+      ['G3532230','Jonathan da Silva','Supervisor'],
+      ['A0181407','Leone Ferreira da Silva','Supervisor'],
+      ['A0126214','Priscila Teixeira Da Silva Almeida','Supervisor'],
+      ['G31699','Carlos Henrique Recoliano','Supervisor'],
+      ['G3539934','Wagner Nespoli Pereira','Supervisor'],
+      ['A0130197','GLAUCO CANDIDO SANTANA','Coordenador']
+    ];
+    oficiais.forEach(([mat,nome,cargo])=>{
+      const key=mat.toUpperCase();
+      let u=DB.usuarios.find(x=>String(x.matricula||x.login||'').trim().toUpperCase()===key);
+      if(!u){
+        u={uid:uid(),nome_completo:nome,matricula:key,login:key,cargo,role:'Comum',
+           supervisor_uid:null,status_ativo:true,status_ferias:false,email:'',
+           senha:'1234',senha_provisoria:false};
+        DB.usuarios.push(u); changed=true;
+      }else{
+        // Nunca altera senha nem login existentes.
+        const patch={nome_completo:nome,matricula:key,cargo,status_ativo:true};
+        Object.entries(patch).forEach(([k,v])=>{if(u[k]!==v){u[k]=v;changed=true;}});
+        if(!u.login){u.login=key;changed=true;}
+        if(!u.senha){u.senha='1234';changed=true;}
+        if(u.senha_provisoria!==false){u.senha_provisoria=false;changed=true;}
+      }
+    });
+    DB.liderancas_oficiais_versao=1;
     return changed;
   }
 
   async function loadDB(){
-    let isNew = false;
-    let cloudNeedsSeed = false;
-    try {
-      let val = null;
-      if (cloudStore) {
-        const snapshot = await cloudStore.collection('presenca_vivo').doc('dados_compartilhados').get();
-        if (snapshot.exists && snapshot.data() && snapshot.data().conteudo) {
-          val = snapshot.data().conteudo;
-          cloudOnline = true;
+    let isNew=false, migrated=false;
+    let localVal=null, localTs=0, cloudVal=null, cloudTs=0;
+
+    // Lê primeiro a cópia local. Ela garante login mesmo com internet instável.
+    try{
+      if(typeof window.storage!=='undefined' && window.storage && typeof window.storage.get==='function'){
+        const res=await window.storage.get(KEY,true);
+        localVal=res?res.value:null;
+      }else{
+        localVal=localStorage.getItem(KEY);
+      }
+      localTs=Number(localStorage.getItem(KEY+'_updated_at')||0);
+    }catch(e){ console.warn('Leitura local indisponível',e); }
+
+    // Nuvem é complementar. Uma falha aqui não apaga nem recria a base local.
+    if(cloudStore){
+      try{
+        const snapshot=await cloudStore.collection('presenca_vivo').doc('dados_compartilhados').get();
+        if(snapshot.exists && snapshot.data() && snapshot.data().conteudo){
+          cloudVal=snapshot.data().conteudo;
+          cloudTs=Number(snapshot.data().atualizado_em||0);
+          cloudOnline=true;
         }
+      }catch(e){
+        cloudOnline=false;
+        console.warn('Nuvem temporariamente indisponível',e);
       }
-      if (!val && typeof window.storage !== 'undefined' && window.storage && typeof window.storage.get === 'function') {
-        const res = await window.storage.get(KEY, true);
-        val = res ? res.value : null;
-      } else if (!val) {
-        val = localStorage.getItem(KEY);
-      }
-      if (cloudStore && !cloudOnline && val) cloudNeedsSeed = true;
-      if(val) {
-        DB = JSON.parse(val);
-      } else {
-        DB = seedData();
-        isNew = true;
-      }
-    } catch(e) {
-      DB = seedData();
-      isNew = true;
     }
 
-    let migrated = false;
-    DB.usuarios.forEach(x => { if(!x.senha){ x.senha = '1234'; migrated = true; } });
-    // Migração: o login oficial passa a ser a matrícula, iniciada por A0 ou G0.
-    const usadas = new Set();
-    DB.usuarios.forEach((x, idx) => {
-      let mat = String(x.matricula || x.login || '').trim().toUpperCase();
+    let val=null;
+    if(localVal && cloudVal) val=(localTs>=cloudTs ? localVal : cloudVal);
+    else val=localVal||cloudVal;
+
+    try{
+      DB=val?JSON.parse(val):seedData();
+      isNew=!val;
+    }catch(e){
+      console.error('Base inválida; usando base segura',e);
+      DB=seedData(); isNew=true;
+    }
+
+    if(!Array.isArray(DB.usuarios)) DB.usuarios=[];
+    if(!DB.presencas) DB.presencas={};
+    if(!DB.solicitacoes) DB.solicitacoes=[];
+    if(!DB.escalas) DB.escalas=[];
+    if(!DB.resets) DB.resets=[];
+    if(!DB.cidades_trabalho) DB.cidades_trabalho={};
+
+    const usadas=new Set();
+    DB.usuarios.forEach((x,idx)=>{
+      let mat=String(x.matricula||x.login||'').trim().toUpperCase();
       if(!/^(A0|G[0-9])[A-Z0-9]+$/.test(mat) || usadas.has(mat)){
-        let n = idx + 1;
-        do { mat = 'A0' + String(n).padStart(5,'0'); n++; } while(usadas.has(mat));
-        migrated = true;
+        let n=idx+1;
+        do{mat='A0'+String(n).padStart(5,'0');n++;}while(usadas.has(mat));
+        migrated=true;
       }
       usadas.add(mat);
-      if(x.matricula !== mat || x.login !== mat){ x.matricula = mat; x.login = mat; migrated = true; }
-      if(x.supervisor_uid===undefined){ x.supervisor_uid = null; migrated = true; }
+      if(x.matricula!==mat){x.matricula=mat;migrated=true;}
+      // Não sobrescreve login personalizado existente.
+      if(!x.login){x.login=mat;migrated=true;}
+      if(x.supervisor_uid===undefined){x.supervisor_uid=null;migrated=true;}
+      if(x.pht===undefined){x.pht=null;migrated=true;}
     });
-    DB.usuarios.forEach(x => { if(x.senha_provisoria===undefined){ x.senha_provisoria = false; migrated = true; } });
-    DB.usuarios.forEach(x => { if(x.pht===undefined){ x.pht = null; migrated = true; } });
-    if(!DB.resets){ DB.resets = []; migrated = true; }
-    if(!DB.cidades_trabalho){ DB.cidades_trabalho = {}; migrated = true; }
-    if(garantirSupervisoresOficiais()) migrated = true;
-    if(aplicarImportacaoTecnicos()) migrated = true;
-    if(migrarSupervisores20260921()) migrated = true;
-    if(normalizarSenhasTodosUsuarios()) migrated = true;
-    if(cadastrarAssistentesOficiais20260921()) migrated = true;
-    if(isNew || migrated || cloudNeedsSeed) await saveDB();
+
+    if(garantirSupervisoresOficiais()) migrated=true;
+    if(aplicarImportacaoTecnicos()) migrated=true;
+    if(migrarSupervisores20260921()) migrated=true;
+    if(normalizarSenhasTodosUsuarios()) migrated=true;
+    if(cadastrarAssistentesOficiais20260921()) migrated=true;
+    if(garantirLiderancasOficiais20260922()) migrated=true;
+
+    // Se a cópia local é mais nova, não deixa a nuvem antiga sobrescrever a senha.
+    if(isNew || migrated || (localVal && localTs>cloudTs)) await saveDB(true);
   }
 
-  async function saveDB(){
-    try {
-      const json = JSON.stringify(DB);
-      if (cloudStore) {
+  async function saveDB(silencioso=false){
+    const json=JSON.stringify(DB);
+    const agora=Date.now();
+    let localOk=false, cloudOk=false;
+
+    // LOCAL PRIMEIRO: login e senha nunca dependem da nuvem para serem preservados.
+    try{
+      if(typeof window.storage!=='undefined' && window.storage && typeof window.storage.set==='function'){
+        await window.storage.set(KEY,json,true);
+      }else{
+        localStorage.setItem(KEY,json);
+      }
+      localStorage.setItem(KEY+'_updated_at',String(agora));
+      localOk=true;
+    }catch(e){ console.error('Falha ao salvar localmente',e); }
+
+    // Depois tenta sincronizar. Se falhar, a cópia local continua íntegra.
+    if(cloudStore){
+      try{
         await cloudStore.collection('presenca_vivo').doc('dados_compartilhados').set({
-          conteudo: json,
-          atualizado_em: Date.now(),
-          versao: 1
+          conteudo:json, atualizado_em:agora, versao:2
         });
-        cloudOnline = true;
+        cloudOnline=true; cloudOk=true;
+      }catch(e){
+        cloudOnline=false;
+        console.warn('Sincronização em nuvem pendente',e);
       }
-      if (typeof window.storage !== 'undefined' && window.storage && typeof window.storage.set === 'function') {
-        await window.storage.set(KEY, json, true);
-      } else {
-        localStorage.setItem(KEY, json);
-      }
-    } catch(e) {
-      console.error('storage error', e);
-      showToast('Falha ao sincronizar. Verifique a internet e tente novamente.');
+    }else{
+      cloudOk=true;
     }
+
+    if(!silencioso){
+      if(localOk && cloudOk) showToast('Dados salvos e sincronizados.');
+      else if(localOk) showToast('Dados salvos neste aparelho. Sincronização pendente.');
+      else showToast('Não foi possível salvar os dados.');
+    }
+    return localOk;
+  }
+
+
+  let unsubscribeAutoSync=null;
+  function iniciarAtualizacaoAutomatica(){
+    if(!cloudStore || unsubscribeAutoSync) return;
+    try{
+      unsubscribeAutoSync=cloudStore.collection('presenca_vivo').doc('dados_compartilhados')
+        .onSnapshot(snap=>{
+          try{
+            if(!snap.exists || !snap.data() || !snap.data().conteudo) return;
+            const remotoTs=Number(snap.data().atualizado_em||0);
+            const localTs=Number(localStorage.getItem(KEY+'_updated_at')||0);
+            if(remotoTs<=localTs) return;
+
+            const remoto=JSON.parse(snap.data().conteudo);
+            if(!remoto || !Array.isArray(remoto.usuarios)) return;
+
+            // Senhas e logins locais existentes têm prioridade.
+            const locais=new Map((DB.usuarios||[]).map(u=>[
+              String(u.matricula||u.login||'').trim().toUpperCase(),u
+            ]));
+            remoto.usuarios.forEach(u=>{
+              const k=String(u.matricula||u.login||'').trim().toUpperCase();
+              const old=locais.get(k);
+              if(old){
+                if(old.senha) u.senha=old.senha;
+                if(old.login) u.login=old.login;
+                u.senha_provisoria=false;
+              }
+            });
+
+            DB=remoto;
+            garantirSupervisoresOficiais();
+            migrarSupervisores20260921();
+            normalizarSenhasTodosUsuarios();
+            cadastrarAssistentesOficiais20260921();
+            garantirLiderancasOficiais20260922();
+
+            try{
+              localStorage.setItem(KEY,JSON.stringify(DB));
+              localStorage.setItem(KEY+'_updated_at',String(remotoTs));
+            }catch(e){}
+            render();
+            showToast('Cadastro atualizado automaticamente.');
+          }catch(e){console.warn('Atualização automática ignorada',e);}
+        },err=>{cloudOnline=false;console.warn('Sincronização em tempo real indisponível',err);});
+    }catch(e){console.warn('Não foi possível iniciar atualização automática',e);}
   }
 
   function showToast(msg){
@@ -2054,6 +2170,11 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
 #vivo-splash .vivo-splash-logo{width:min(88vw,560px)!important;max-height:260px!important;filter:brightness(0) invert(1) drop-shadow(0 14px 34px rgba(0,0,0,.32))!important;transform:scale(1.15)}
 @media(max-width:620px){#vivo-splash .vivo-splash-logo{width:88vw!important;max-height:220px!important}.login-vivo-logo{width:min(88vw,340px)!important;height:135px!important}}
 </style>
+
+<style id="pv-professional-sync">
+.pvh-sync{font:700 11px Inter,"Segoe UI",Arial,sans-serif;color:#5b168d;background:#f3eafb;border:1px solid #e1cdf4;border-radius:999px;padding:7px 10px;white-space:nowrap}
+@media(max-width:700px){.pvh-sync{display:none}}
+</style>
 </head>
 <body>
   <div class="top">
@@ -2150,7 +2271,7 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
         <button class="pvh-nav active" data-nav="home">⌂ <span>Tela inicial</span></button>
         <button class="pvh-nav" data-nav="presenca">▣ <span>Escala</span></button>
         <button class="pvh-nav" data-nav="solicitacoes">▤ <span>Solicitações</span></button>
-        ${u.role==='Administrador'||u.role==='Supervisor'?`<button class="pvh-nav" data-nav="admin">♟ <span>Minha Equipe</span></button>`:''}
+        ${u.role==='Administrador'||u.role==='Supervisor'||u.cargo==='Coordenador'?`<button class="pvh-nav" data-nav="admin">♟ <span>Minha Equipe</span></button>`:''}
         <div class="pvh-spacer"></div>
         <div class="pvh-motto">Juntos no MOP Vivo<br><small>Cluster Vitória: conectando pessoas,<br>superando metas e fazendo a diferença.</small></div>
         <button class="pvh-logout" data-logout-app>⏻ &nbsp; Sair</button>
@@ -2158,7 +2279,7 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
       <main class="pvh-main">
         <header class="pvh-top">
           <div class="pvh-brand"><span>✱</span><div><strong>Presença Vivo</strong><small>Controle de Marcação e Escala</small></div></div>
-          <div class="pvh-user"><span class="pvh-avatar">${esc(inic)}</span><div><strong>${esc(u.nome_completo)}</strong><small>${esc(u.role)}</small></div><div class="pvh-date"><small>Data de hoje</small><b>${dataHoje}</b></div></div>
+          <div class="pvh-user"><span class="pvh-sync" title="Os dados são salvos localmente e sincronizados quando a nuvem está disponível">● Sincronização protegida</span><span class="pvh-avatar">${esc(inic)}</span><div><strong>${esc(u.nome_completo)}</strong><small>${esc(u.role)}</small></div><div class="pvh-date"><small>Data de hoje</small><b>${dataHoje}</b></div></div>
         </header>
         <section class="pvh-page">
           <div class="pvh-welcome"><div><small>PERFIL: ${esc((u.role||'').toUpperCase())}</small><h1>Olá, ${esc((u.nome_completo||'').split(' ')[0])}</h1><p>Organize sua presença, escala e solicitações em um só lugar.</p></div><div class="pvh-watermark">vivo</div></div>
@@ -2949,7 +3070,7 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
         const u = perfil && perfil.candidatos.find(x => (x.matricula||x.login||'').toUpperCase()===login && x.cargo===perfil.cargo);
         if(u && u.status_ativo && val === u.senha){
           currentUid = u.uid; pendingUid = null;
-          route = u.senha_provisoria ? 'trocar-senha' : 'home';
+          route = 'home';
           render();
         } else {
           showToast('Matrícula ou senha incorretas para o perfil selecionado.');
@@ -3390,6 +3511,7 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
 
   window.addEventListener('DOMContentLoaded', async () => {
     await loadDB();
+    iniciarAtualizacaoAutomatica();
     atualizarStatusFerias();
     await saveDB();
     render();
