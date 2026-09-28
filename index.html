@@ -1300,6 +1300,7 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
 
 <!-- Base compartilhada: Firebase / Cloud Firestore -->
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script>
 (function(){
@@ -1337,9 +1338,34 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
   };
   let cloudStore = null;
   let cloudOnline = false;
+  let cloudReady = Promise.resolve(false);
+  let syncRetryTimer = null;
+
   try {
     if (window.firebase && !firebase.apps.length) firebase.initializeApp(firebaseConfig);
     cloudStore = window.firebase ? firebase.firestore() : null;
+
+    if(cloudStore){
+      // Cache Firestore ajuda quando o aparelho fica temporariamente sem rede.
+      try{ cloudStore.enablePersistence({synchronizeTabs:true}).catch(()=>{}); }catch(e){}
+
+      // Todos os aparelhos usam uma sessão Firebase autenticada.
+      // É necessário deixar o provedor "Anônimo" habilitado no Firebase Authentication.
+      cloudReady=(async()=>{
+        try{
+          if(firebase.auth){
+            const auth=firebase.auth();
+            if(!auth.currentUser) await auth.signInAnonymously();
+          }
+          cloudOnline=true;
+          return true;
+        }catch(e){
+          cloudOnline=false;
+          console.warn('Autenticação da sincronização indisponível',e);
+          return false;
+        }
+      })();
+    }
   } catch (e) { console.warn('Firebase indisponível', e); }
 
   function uid(){ return Math.random().toString(36).slice(2,10); }
@@ -1653,6 +1679,7 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
     // Nuvem é complementar. Uma falha aqui não apaga nem recria a base local.
     if(cloudStore){
       try{
+        await cloudReady;
         const snapshot=await cloudStore.collection('presenca_vivo').doc('dados_compartilhados').get();
         if(snapshot.exists && snapshot.data() && snapshot.data().conteudo){
           cloudVal=snapshot.data().conteudo;
@@ -1731,13 +1758,17 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
     // Depois tenta sincronizar. Se falhar, a cópia local continua íntegra.
     if(cloudStore){
       try{
+        await cloudReady;
         await cloudStore.collection('presenca_vivo').doc('dados_compartilhados').set({
           conteudo:json, atualizado_em:agora, versao:2
         });
         cloudOnline=true; cloudOk=true;
+        localStorage.removeItem(KEY+'_sync_pending');
       }catch(e){
         cloudOnline=false;
+        localStorage.setItem(KEY+'_sync_pending','1');
         console.warn('Sincronização em nuvem pendente',e);
+        agendarNovaTentativaSync();
       }
     }else{
       cloudOk=true;
@@ -1745,17 +1776,34 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
 
     if(!silencioso){
       if(localOk && cloudOk) showToast('Dados salvos e sincronizados.');
-      else if(localOk) showToast('Dados salvos neste aparelho. Sincronização pendente.');
+      else if(localOk) showToast('Dados salvos. Tentando sincronizar automaticamente...');
       else showToast('Não foi possível salvar os dados.');
     }
     return localOk;
   }
 
 
+  function agendarNovaTentativaSync(){
+    if(syncRetryTimer) return;
+    syncRetryTimer=setTimeout(async()=>{
+      syncRetryTimer=null;
+      if(localStorage.getItem(KEY+'_sync_pending')==='1' && navigator.onLine){
+        await saveDB(true);
+      }
+    },15000);
+  }
+
+  window.addEventListener('online',()=>{
+    cloudOnline=true;
+    if(localStorage.getItem(KEY+'_sync_pending')==='1') saveDB(true);
+  });
+  window.addEventListener('offline',()=>{cloudOnline=false;});
+
   let unsubscribeAutoSync=null;
-  function iniciarAtualizacaoAutomatica(){
+  async function iniciarAtualizacaoAutomatica(){
     if(!cloudStore || unsubscribeAutoSync) return;
     try{
+      await cloudReady;
       unsubscribeAutoSync=cloudStore.collection('presenca_vivo').doc('dados_compartilhados')
         .onSnapshot(snap=>{
           try{
