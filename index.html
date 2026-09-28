@@ -1334,7 +1334,8 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
     projectId: 'presenca-vivo',
     storageBucket: 'presenca-vivo.firebasestorage.app',
     messagingSenderId: '1854907572807',
-    appId: '1:1854907572807:web:c34a47089b844d0bbf1502'
+    appId: '1:1854907572807:web:c34a47089b844d0bbf1502',
+    measurementId: 'G-SGWPYBECTV'
   };
   let cloudStore = null;
   let cloudOnline = false;
@@ -3601,6 +3602,46 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
     render();
   }
 
+  // Navegação do shell e botão 'Tela inicial' ficam dentro do mesmo escopo do app.
+  document.addEventListener('click', function(e){
+    const tab = e.target.closest('.pv-shell [data-atab]');
+    if(tab){
+      e.preventDefault();
+      adminTab = tab.dataset.atab;
+      route = 'admin';
+      render();
+      return;
+    }
+    const homeBtn = e.target.closest('#pv-home-always-btn');
+    if(homeBtn){
+      e.preventDefault();
+      route = 'home';
+      render();
+    }
+  });
+
+  function atualizarBotaoTelaInicial(){
+    const logged = !!currentUser();
+    let b = document.getElementById('pv-home-always-btn');
+    if(logged && route !== 'login' && route !== 'perfil'){
+      if(!b){
+        b = document.createElement('button');
+        b.id = 'pv-home-always-btn';
+        b.innerHTML = '⌂ <span>Tela inicial</span>';
+        document.body.appendChild(b);
+      }
+      b.style.display = route === 'home' ? 'none' : 'flex';
+    }else if(b){
+      b.remove();
+    }
+  }
+
+  const renderBase = render;
+  render = function(){
+    renderBase();
+    atualizarBotaoTelaInicial();
+  };
+
   window.addEventListener('DOMContentLoaded', async () => {
     await loadDB();
     iniciarAtualizacaoAutomatica();
@@ -3609,16 +3650,6 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
     render();
   });
 })();
-</script>
-
-
-<script id="pv-shell-events-final">
-document.addEventListener('click',function(e){
- const b=e.target.closest('.pv-shell [data-atab]');
- if(!b)return;
- e.preventDefault();
- adminTab=b.dataset.atab; route='admin'; render();
-});
 </script>
 
 
@@ -3634,25 +3665,7 @@ document.addEventListener('click',function(e){
 #pv-home-always-btn:hover{transform:translateY(-1px)}
 @media(max-width:600px){#pv-home-always-btn{right:12px;bottom:72px;padding:10px 13px}}
 </style>
-<script id="pv-home-always-js">
-document.addEventListener('click',function(e){
- const b=e.target.closest('#pv-home-always-btn');
- if(!b)return;
- e.preventDefault(); route='home'; render();
-});
-(function(){
- const originalRender=render;
- render=function(){
-   originalRender();
-   const logged=!!sessionUser();
-   let b=document.getElementById('pv-home-always-btn');
-   if(logged && route!=='login' && route!=='perfil'){
-     if(!b){b=document.createElement('button');b.id='pv-home-always-btn';b.innerHTML='⌂ <span>Tela inicial</span>';document.body.appendChild(b);}
-     b.style.display=route==='home'?'none':'flex';
-   }else if(b){b.remove();}
- };
-})();
-</script>
+
 
 </body>
 </html>
