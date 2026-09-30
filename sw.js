@@ -1,22 +1,11 @@
-const CACHE_VERSION = 'presenca-vivo-v7';
+const CACHE_VERSION = 'presenca-vivo-v8-chave-corrigida';
 
-const APP_SHELL = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './icon.svg'
-];
+const APP_SHELL = ['./','./index.html','./manifest.webmanifest','./icon.svg'];
 
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_VERSION);
-
-    await Promise.allSettled(
-      APP_SHELL.map(url =>
-        cache.add(new Request(url, { cache: 'reload' }))
-      )
-    );
-
+    await Promise.allSettled(APP_SHELL.map(url => cache.add(new Request(url, {cache:'reload'}))));
     await self.skipWaiting();
   })());
 });
@@ -24,81 +13,47 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-
-    await Promise.all(
-      keys
-        .filter(key => key !== CACHE_VERSION)
-        .map(key => caches.delete(key))
-    );
-
+    await Promise.all(keys.filter(key => key !== CACHE_VERSION).map(key => caches.delete(key)));
     await self.clients.claim();
   })());
 });
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
-
   const req = event.request;
   const url = new URL(req.url);
 
-  // Firebase e serviços externos não passam pelo cache.
+  // Não intercepta Firebase nem outros serviços externos.
   if (url.origin !== self.location.origin) return;
 
-  // Página principal: sempre procura a versão nova primeiro.
-  if (
-    req.mode === 'navigate' ||
-    url.pathname.endsWith('/index.html')
-  ) {
+  // HTML/navegação: rede primeiro e sem cache HTTP.
+  if (req.mode === 'navigate' || url.pathname.endsWith('/index.html')) {
     event.respondWith((async () => {
       try {
-        const fresh = await fetch(req, {
-          cache: 'no-store'
-        });
-
+        const fresh = await fetch(req, {cache:'no-store'});
         if (fresh && fresh.ok) {
           const cache = await caches.open(CACHE_VERSION);
-
-          cache.put(
-            './index.html',
-            fresh.clone()
-          ).catch(() => {});
+          cache.put('./index.html', fresh.clone()).catch(() => {});
         }
-
         return fresh;
-
       } catch (e) {
-
-        return (
-          await caches.match('./index.html')
-        ) || (
-          await caches.match('./')
-        ) || Response.error();
+        return (await caches.match('./index.html')) || (await caches.match('./')) || Response.error();
       }
     })());
-
     return;
   }
 
-  // Outros arquivos locais: rede primeiro.
+  // Arquivos locais: rede primeiro, cache apenas como contingência.
   event.respondWith((async () => {
     try {
       const fresh = await fetch(req);
-
       if (fresh && fresh.ok) {
         const cache = await caches.open(CACHE_VERSION);
-
-        cache.put(
-          req,
-          fresh.clone()
-        ).catch(() => {});
+        cache.put(req, fresh.clone()).catch(() => {});
       }
-
       return fresh;
-
     } catch (e) {
-      return (
-        await caches.match(req)
-      ) || Response.error();
+      return (await caches.match(req)) || Response.error();
     }
   })());
 });
