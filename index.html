@@ -1333,8 +1333,8 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
     authDomain: 'presenca-vivo.firebaseapp.com',
     projectId: 'presenca-vivo',
     storageBucket: 'presenca-vivo.firebasestorage.app',
-    messagingSenderId: '185490752807',
-    appId: '1:185490752807:web:c34a47089b844d0bbf1502',
+    messagingSenderId: '1854907572807',
+    appId: '1:1854907572807:web:c34a47089b844d0bbf1502',
     measurementId: 'G-SGWPYBECTV'
   };
   let cloudStore = null;
@@ -1977,86 +1977,75 @@ body:has(.pvh-shell)>.topbar,body:has(.pvh-shell) .bottom-nav{display:none!impor
       return;
     }
     atualizarStatusFerias();
-    // Relatório gerencial: inclui TODOS os cadastros do app, sem alterar dados, logins ou senhas.
-    const pessoas=(DB.usuarios||[]).slice().sort((a,b)=>String(a.nome_completo||'').localeCompare(String(b.nome_completo||''),'pt-BR'));
-    const tecnicos=pessoas.filter(x=>x.cargo==='Técnico');
-    const assistentes=pessoas.filter(x=>x.cargo==='Assistente');
-    const supervisores=pessoas.filter(x=>x.cargo==='Supervisor');
-    const coordenadores=pessoas.filter(x=>x.cargo==='Coordenador');
-    const administradores=pessoas.filter(x=>x.role==='Administrador'||x.cargo==='Administrador');
+    const atual=currentUser();
+    const todos=(DB.usuarios||[]).slice();
+    const equipe=(!atual || atual.role==='Administrador' || atual.cargo==='Coordenador')
+      ? todos
+      : (ehLider(atual) ? [atual,...equipeDoSupervisor(atual.uid)] : [atual]);
+    const usuarios=equipe.sort((a,b)=>(a.cargo||'').localeCompare(b.cargo||'') || (a.nome_completo||'').localeCompare(b.nome_completo||''));
+    const tecnicos=usuarios.filter(x=>x.cargo==='Técnico');
+    const assistentes=usuarios.filter(x=>x.cargo==='Assistente');
+    const supervisores=usuarios.filter(x=>x.cargo==='Supervisor');
+    const coordenadores=usuarios.filter(x=>x.cargo==='Coordenador');
+    const administradores=usuarios.filter(x=>x.role==='Administrador' || x.cargo==='Administrador');
     const semana=datasSemanaRelatorio();
-    const purple='660099', purpleDark='2B1238', purple2='8A00B8', lavender='EEE3F4', light='FAF8FC', white='FFFFFF', line='D8C4E5', green='087A36', greenBg='E7F6EC', red='B00020', redBg='FDE8E8', amber='8A5A00', amberBg='FFF2CC', gray='6B5A74';
+    const purple='660099', purple2='8A00B8', dark='2B1238', lavender='EEE3F4', bg='F7F4FA', white='FFFFFF', line='D8C4E5', green='E7F6EC', greenText='087A36', red='FDE8E8', redText='B00020', yellow='FFF2CC', yellowText='8A5A00';
     const wb=new ExcelJS.Workbook();
-    wb.creator='Presença Vivo'; wb.lastModifiedBy='Presença Vivo'; wb.created=new Date(); wb.modified=new Date();
+    wb.creator='Presença Vivo - Cluster Vitória'; wb.lastModifiedBy='Presença Vivo'; wb.created=new Date(); wb.modified=new Date();
     const thin={style:'thin',color:{argb:line}};
     const border={top:thin,left:thin,bottom:thin,right:thin};
-    const fill=c=>({type:'pattern',pattern:'solid',fgColor:{argb:c}});
     const center={vertical:'middle',horizontal:'center'};
-    const bodyFont={name:'Aptos',size:10,color:{argb:purpleDark}};
-    const headerFont={name:'Aptos',size:10,bold:true,color:{argb:white}};
+    const left={vertical:'middle',horizontal:'left'};
+    const fill=c=>({type:'pattern',pattern:'solid',fgColor:{argb:c}});
+    const font=(size=10,bold=false,color=dark)=>({name:'Aptos',size,bold,color:{argb:color}});
     const titleFont={name:'Aptos Display',size:20,bold:true,color:{argb:white}};
-    const addTitle=(ws,title,sub,lastCol)=>{
-      ws.mergeCells(`A1:${lastCol}2`); ws.getCell('A1').value='VIVO  |  '+title; ws.getCell('A1').fill=fill(purple); ws.getCell('A1').font=titleFont; ws.getCell('A1').alignment={vertical:'middle',horizontal:'left'};
-      ws.mergeCells(`A3:${lastCol}3`); ws.getCell('A3').value=sub; ws.getCell('A3').fill=fill(purple2); ws.getCell('A3').font={name:'Aptos',size:11,bold:true,color:{argb:white}}; ws.getCell('A3').alignment={vertical:'middle',horizontal:'left'};
-      ws.getRow(1).height=25; ws.getRow(2).height=25; ws.getRow(3).height=22;
-    };
-    const statusPessoa=u=>u.status_ferias?'FÉRIAS':(u.status_ativo===false?'INATIVO':'ATIVO');
-    const responsavel=u=>{const sup=supervisorDo(u); return sup?sup.nome_completo:(u.role==='Administrador'?'ADMINISTRAÇÃO':'Não definido');};
+    const statusTexto=u=>u.status_ferias?'FÉRIAS':(u.status_ativo===false?'INATIVO':'ATIVO');
+    const responsavel=u=>{const sup=supervisorDo(u);return sup?sup.nome_completo:(u.cargo==='Supervisor'||u.cargo==='Coordenador'||u.role==='Administrador'?'Liderança':'Não definido');};
+    const presHoje=usuarios.filter(u=>(DB.presencas||{})[u.uid+'_'+todayISO()]).length;
+    const ativos=usuarios.filter(u=>u.status_ativo!==false && !u.status_ferias).length;
+    const inativos=usuarios.filter(u=>u.status_ativo===false).length;
+    const ferias=usuarios.filter(u=>u.status_ferias).length;
 
     // PAINEL EXECUTIVO
-    const painel=wb.addWorksheet('Painel Executivo',{views:[{showGridLines:false,state:'frozen',ySplit:3}]});
-    painel.columns=Array.from({length:16},(_,i)=>({width:i===0?27:13}));
-    addTitle(painel,'SISTEMA DE GESTÃO — CLUSTER VITÓRIA','PRESENÇA DE CAMPO MOP  •  DASHBOARD GERENCIAL','P');
-    const ativos=pessoas.filter(x=>x.status_ativo!==false&&!x.status_ferias).length;
-    const inativos=pessoas.filter(x=>x.status_ativo===false).length;
-    const ferias=pessoas.filter(x=>x.status_ferias).length;
-    const presSem=Object.values(DB.presencas||{}).filter(p=>pessoas.some(u=>u.uid===p.usuario_uid)&&semana.includes(p.data_formatada)).length;
-    const cards=[['TOTAL NO APP',pessoas.length],['ATIVOS',ativos],['FÉRIAS',ferias],['PRESENÇAS NA SEMANA',presSem]];
-    [['A','D'],['E','H'],['I','L'],['M','P']].forEach((cols,i)=>{
-      painel.mergeCells(`${cols[0]}5:${cols[1]}5`); painel.mergeCells(`${cols[0]}6:${cols[1]}8`);
-      let a=painel.getCell(`${cols[0]}5`), b=painel.getCell(`${cols[0]}6`); a.value=cards[i][0]; b.value=cards[i][1];
-      a.fill=fill(lavender); a.font={name:'Aptos',size:10,bold:true,color:{argb:purple}}; a.alignment=center;
-      b.fill=fill(white); b.font={name:'Aptos Display',size:24,bold:true,color:{argb:purpleDark}}; b.alignment=center; b.border=border;
-    });
-    painel.mergeCells('A11:H11'); painel.getCell('A11').value='COMPOSIÇÃO DO APP'; painel.getCell('A11').fill=fill(purple); painel.getCell('A11').font=headerFont;
-    painel.getRange = undefined;
-    const perfis=[['Técnicos',tecnicos.length],['Assistentes',assistentes.length],['Supervisores',supervisores.length],['Coordenadores',coordenadores.length],['Administradores',administradores.length],['Inativos',inativos]];
-    ['PERFIL','QUANTIDADE'].forEach((h,i)=>{let c=painel.getCell(13,1+i);c.value=h;c.fill=fill(purpleDark);c.font=headerFont;c.alignment=center;c.border=border;});
-    perfis.forEach((r,i)=>{painel.getCell(14+i,1).value=r[0];painel.getCell(14+i,2).value=r[1];for(let c=1;c<=2;c++){let x=painel.getCell(14+i,c);x.font=bodyFont;x.border=border;x.alignment=c===1?{vertical:'middle',horizontal:'left'}:center;if(i%2)x.fill=fill(light);}});
-    painel.mergeCells('A22:P23'); painel.getCell('A22').value='Relatório gerencial profissional • Cluster Vitória ES • Base consolidada com todos os usuários cadastrados no Presença Vivo'; painel.getCell('A22').font={name:'Aptos',size:9,italic:true,color:{argb:gray}}; painel.getCell('A22').alignment=center; painel.getCell('A22').fill=fill(white);
+    const painel=wb.addWorksheet('PAINEL EXECUTIVO',{views:[{showGridLines:false,state:'frozen',ySplit:3}]});
+    painel.columns=Array.from({length:16},(_,i)=>({width:i===0?29:13}));
+    painel.mergeCells('A1:P2'); painel.getCell('A1').value='VIVO  |  SISTEMA DE GESTÃO — CLUSTER VITÓRIA'; painel.getCell('A1').fill=fill(purple); painel.getCell('A1').font=titleFont; painel.getCell('A1').alignment=left;
+    painel.mergeCells('A3:P3'); painel.getCell('A3').value='PRESENÇA DE CAMPO MOP  •  DASHBOARD GERENCIAL'; painel.getCell('A3').fill=fill(purple2); painel.getCell('A3').font=font(11,true,white); painel.getCell('A3').alignment=left;
+    const cards=[['A5:D5','A6:D8','TOTAL NO APP',usuarios.length],['E5:H5','E6:H8','ATIVOS',ativos],['I5:L5','I6:L8','INATIVOS',inativos],['M5:P5','M6:P8','PRESENÇAS HOJE',presHoje]];
+    cards.forEach(([lr,vr,label,value])=>{painel.mergeCells(lr);painel.mergeCells(vr);const l=painel.getCell(lr.split(':')[0]),v=painel.getCell(vr.split(':')[0]);l.value=label;l.fill=fill(lavender);l.font=font(10,true,purple);l.alignment=center;v.value=value;v.fill=fill(white);v.font={name:'Aptos Display',size:24,bold:true,color:{argb:dark}};v.alignment=center;v.border=border;});
+    painel.mergeCells('A11:H11'); painel.getCell('A11').value='COMPOSIÇÃO DA EQUIPE'; painel.getCell('A11').fill=fill(purple); painel.getCell('A11').font=font(12,true,white);
+    const comp=[['PERFIL','QUANTIDADE'],['Técnicos',tecnicos.length],['Assistentes',assistentes.length],['Supervisores',supervisores.length],['Coordenadores',coordenadores.length],['Administradores',administradores.length],['Em férias',ferias]];
+    comp.forEach((r,i)=>{painel.getCell(13+i,1).value=r[0];painel.getCell(13+i,2).value=r[1];for(let c=1;c<=2;c++){const cell=painel.getCell(13+i,c);cell.border=border;cell.alignment=c===1?left:center;cell.font=font(10,i===0,i===0?white:dark);cell.fill=fill(i===0?dark:(i%2?white:bg));}});
+    painel.mergeCells('D11:P11'); painel.getCell('D11').value='INDICADORES DE STATUS'; painel.getCell('D11').fill=fill(purple); painel.getCell('D11').font=font(12,true,white);
+    const stats=[['Indicador','Quantidade'],['Ativos',ativos],['Inativos',inativos],['Férias',ferias],['Presenças hoje',presHoje]];
+    stats.forEach((r,i)=>{painel.getCell(13+i,4).value=r[0];painel.getCell(13+i,5).value=r[1];for(let c=4;c<=5;c++){const cell=painel.getCell(13+i,c);cell.border=border;cell.alignment=c===4?left:center;cell.font=font(10,i===0,i===0?white:dark);cell.fill=fill(i===0?dark:(i%2?white:bg));}});
+    painel.mergeCells('A22:P23'); painel.getCell('A22').value='Relatório gerencial profissional • Cluster Vitória ES • Todos os usuários cadastrados no Presença Vivo'; painel.getCell('A22').fill=fill(white); painel.getCell('A22').font={name:'Aptos',size:9,italic:true,color:{argb:'6B5A74'}}; painel.getCell('A22').alignment=center;
 
     // TODOS DO APP
-    const todos=wb.addWorksheet('Todos do App',{views:[{showGridLines:false,state:'frozen',ySplit:6,xSplit:2}]});
-    todos.columns=[{width:6},{width:34},{width:16},{width:18},{width:32},{width:12},{width:14},{width:14},{width:18},{width:20},{width:20},{width:20},{width:20},{width:20},{width:20},{width:20}];
-    addTitle(todos,'CADASTRO CONSOLIDADO','TODOS OS USUÁRIOS DO APP  •  PERFIL, RESPONSÁVEL, PHT, STATUS E PRESENÇA','P');
-    const headers=['ID','Nome completo','Matrícula / Login','Perfil','Supervisor / Responsável','PHT','Status','Férias','Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo','Próxima escala PHT'];
-    headers.forEach((h,i)=>{let c=todos.getCell(6,1+i);c.value=h;c.fill=fill(purpleDark);c.font=headerFont;c.alignment=center;c.border=border;});
-    const mon=new Date(segundaDaSemana(todayISO())+'T12:00:00');
-    const semana7=Array.from({length:7},(_,i)=>{let d=new Date(mon);d.setDate(mon.getDate()+i);return d.toISOString().slice(0,10);});
-    pessoas.forEach((u,idx)=>{
-      const r=7+idx; const perfil=u.role==='Administrador'?'Administrador':(u.cargo||u.role||'Usuário');
-      const vals=[idx+1,u.nome_completo||'',u.matricula||u.login||'',perfil,responsavel(u),u.pht||'—',statusPessoa(u),u.status_ferias?'SIM':'NÃO'];
-      vals.forEach((v,i)=>todos.getCell(r,1+i).value=v);
-      semana7.forEach((d,i)=>todos.getCell(r,9+i).value=textoPresencaExcel(u.uid,d));
-      todos.getCell(r,16).value=u.pht?proximaEscalaPHT(u.pht):'—';
-      for(let c=1;c<=16;c++){let x=todos.getCell(r,c);x.font=bodyFont;x.border=border;x.alignment=[2,5,16].includes(c)?{vertical:'middle',horizontal:'left'}:center;if(idx%2)x.fill=fill(light);}
-      const st=todos.getCell(r,7); if(u.status_ferias){st.fill=fill(amberBg);st.font={...bodyFont,bold:true,color:{argb:amber}};} else if(u.status_ativo===false){st.fill=fill(redBg);st.font={...bodyFont,bold:true,color:{argb:red}};} else {st.fill=fill(greenBg);st.font={...bodyFont,bold:true,color:{argb:green}};}
-    });
-    todos.autoFilter={from:'A6',to:'P6'};
+    const base=wb.addWorksheet('TODOS DO APP',{views:[{showGridLines:false,state:'frozen',ySplit:7,xSplit:2}]});
+    base.columns=[{width:6},{width:34},{width:16},{width:18},{width:30},{width:12},{width:14},{width:13},{width:18},{width:18},{width:18},{width:18},{width:18},{width:18},{width:18}];
+    base.mergeCells('A1:O2');base.getCell('A1').value='VIVO  |  RELATÓRIO COMPLETO DE USUÁRIOS — CLUSTER VITÓRIA';base.getCell('A1').fill=fill(purple);base.getCell('A1').font=titleFont;base.getCell('A1').alignment=left;
+    base.mergeCells('A3:O3');base.getCell('A3').value='Técnicos • Assistentes • Supervisores • Coordenador • Administrador';base.getCell('A3').fill=fill(purple2);base.getCell('A3').font=font(11,true,white);
+    const headers=['ID','NOME COMPLETO','MATRÍCULA / LOGIN','PERFIL','SUPERVISOR / RESPONSÁVEL','PHT','STATUS','FÉRIAS','SEGUNDA','TERÇA','QUARTA','QUINTA','SEXTA','SÁBADO','DOMINGO'];
+    headers.forEach((h,i)=>{const c=base.getCell(6,1+i);c.value=h;c.fill=fill(dark);c.font=font(10,true,white);c.alignment=center;c.border=border;});
+    semana.concat([(()=>{const d=new Date(semana[5]+'T12:00:00');d.setDate(d.getDate()+1);return d.toISOString().slice(0,10);})()]).forEach((d,i)=>{const c=base.getCell(7,9+i);c.value=fmtDate(d);c.fill=fill(lavender);c.font=font(9,true,purple);c.alignment=center;c.border=border;});
+    usuarios.forEach((u,idx)=>{const r=8+idx;const domingo=new Date(semana[5]+'T12:00:00');domingo.setDate(domingo.getDate()+1);const dias=semana.concat([domingo.toISOString().slice(0,10)]);const vals=[idx+1,u.nome_completo||'',u.matricula||u.login||'',u.role==='Administrador'?'Administrador':(u.cargo||u.role||''),responsavel(u),u.pht||'—',statusTexto(u),u.status_ferias?'SIM':'NÃO'];vals.forEach((v,i)=>base.getCell(r,1+i).value=v);dias.forEach((d,i)=>base.getCell(r,9+i).value=textoPresencaExcel(u.uid,d));for(let c=1;c<=15;c++){const cell=base.getCell(r,c);cell.font=font(9,false,dark);cell.border=border;cell.alignment=(c===2||c===5)?left:center;if(idx%2)cell.fill=fill(bg);}const st=base.getCell(r,7);if(u.status_ferias){st.fill=fill(yellow);st.font=font(9,true,yellowText);}else if(u.status_ativo===false){st.fill=fill(red);st.font=font(9,true,redText);}else{st.fill=fill(green);st.font=font(9,true,greenText);}});
+    base.autoFilter={from:{row:6,column:1},to:{row:6,column:15}};
 
-    // CRONOGRAMA SEMANAL — todos os usuários, mantendo a leitura operacional.
-    const cron=wb.addWorksheet('Cronograma Semanal',{views:[{showGridLines:false,state:'frozen',ySplit:6,xSplit:2}]});
-    cron.columns=[{width:6},{width:34},{width:16},{width:18},{width:30},{width:20},{width:20},{width:20},{width:20},{width:20},{width:20},{width:20}];
-    addTitle(cron,'CRONOGRAMA SEMANAL','PROGRAMAÇÃO COMPLETA  •  TODOS OS USUÁRIOS DO APP','L');
-    const ch=['ID','Nome completo','Matrícula','Perfil','Responsável','Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
-    ch.forEach((h,i)=>{let c=cron.getCell(6,1+i);c.value=h;c.fill=fill(purpleDark);c.font=headerFont;c.alignment=center;c.border=border;});
-    pessoas.forEach((u,idx)=>{const r=7+idx;const perfil=u.role==='Administrador'?'Administrador':(u.cargo||u.role||'Usuário');[idx+1,u.nome_completo||'',u.matricula||u.login||'',perfil,responsavel(u)].forEach((v,i)=>cron.getCell(r,1+i).value=v);semana7.forEach((d,i)=>cron.getCell(r,6+i).value=textoPresencaExcel(u.uid,d));for(let c=1;c<=12;c++){let x=cron.getCell(r,c);x.font=bodyFont;x.border=border;x.alignment=[2,5].includes(c)?{vertical:'middle',horizontal:'left'}:center;if(idx%2)x.fill=fill(light);}});
-    cron.autoFilter={from:'A6',to:'L6'};
+    // CRONOGRAMA SEMANAL
+    const cron=wb.addWorksheet('CRONOGRAMA SEMANAL',{views:[{showGridLines:false,state:'frozen',ySplit:6,xSplit:2}]});
+    cron.columns=[{width:6},{width:34},{width:16},{width:18},{width:28},{width:12},{width:20},{width:20},{width:20},{width:20},{width:20},{width:20},{width:20}];
+    cron.mergeCells('A1:M2');cron.getCell('A1').value='VIVO  |  CRONOGRAMA SEMANAL OPERACIONAL';cron.getCell('A1').fill=fill(purple);cron.getCell('A1').font=titleFont;cron.getCell('A1').alignment=left;
+    const ch=['ID','NOME','MATRÍCULA','PERFIL','RESPONSÁVEL','PHT','SEGUNDA','TERÇA','QUARTA','QUINTA','SEXTA','SÁBADO','DOMINGO'];
+    ch.forEach((h,i)=>{const c=cron.getCell(5,1+i);c.value=h;c.fill=fill(dark);c.font=font(10,true,white);c.alignment=center;c.border=border;});
+    const domingo=new Date(semana[5]+'T12:00:00');domingo.setDate(domingo.getDate()+1);const dias=semana.concat([domingo.toISOString().slice(0,10)]);
+    usuarios.forEach((u,idx)=>{const r=6+idx;const vals=[idx+1,u.nome_completo||'',u.matricula||u.login||'',u.role==='Administrador'?'Administrador':(u.cargo||u.role||''),responsavel(u),u.pht||'—'];vals.forEach((v,i)=>cron.getCell(r,1+i).value=v);dias.forEach((d,i)=>cron.getCell(r,7+i).value=textoPresencaExcel(u.uid,d));for(let c=1;c<=13;c++){const cell=cron.getCell(r,c);cell.font=font(9,false,dark);cell.border=border;cell.alignment=(c===2||c===5)?left:center;if(idx%2)cell.fill=fill(bg);}});
+    cron.autoFilter={from:{row:5,column:1},to:{row:5,column:13}};
 
-    [painel,todos,cron].forEach(ws=>{ws.pageSetup={orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,margins:{left:0.25,right:0.25,top:0.4,bottom:0.4,header:0.2,footer:0.2}};ws.headerFooter.oddFooter='&LPresença Vivo&CRelatório gerado em '+fmtDate(todayISO())+'&RPágina &P de &N';});
+    [painel,base,cron].forEach(ws=>{ws.pageSetup={orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,margins:{left:0.25,right:0.25,top:0.4,bottom:0.4,header:0.2,footer:0.2}};ws.headerFooter.oddFooter='&LPresença Vivo&CRelatório gerado em '+fmtDate(todayISO())+'&RPágina &P de &N';});
     const buffer=await wb.xlsx.writeBuffer();
-    downloadBuffer(buffer,'Relatorio_Equipe_Presenca_Vivo_'+todayISO()+'.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    showToast('Relatório profissional gerado com todos do app!');
+    downloadBuffer(buffer,'Relatorio_Vivo_Cluster_Vitoria_'+todayISO()+'.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    showToast('Relatório profissional gerado com todos os usuários do app!');
   }
 
   function buildReportText(){
